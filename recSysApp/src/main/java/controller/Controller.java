@@ -1,11 +1,17 @@
 package controller;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+
 /**
  * Hello world!
  *
  */
 public class Controller 
 {
+	
 	public void Login() {
 		
 		//login with fb and retrieve info about user and user likes
