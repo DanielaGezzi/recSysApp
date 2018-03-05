@@ -1,4 +1,4 @@
-package controller;
+package recSysApp.controller;
 
 public class GenerationExec {
 
