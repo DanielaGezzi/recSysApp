@@ -28,13 +28,30 @@ function getFbUserData(userAccessToken){
         document.getElementById('buttonFacebook').setAttribute("onclick","fbLogout()");
         document.getElementById('status').innerHTML = 'Thanks for logging in, ' + response.first_name + '!';
         document.getElementById('userData').innerHTML = '<p><b>FB ID:</b> '+response.id+'</p><p><b>Name:</b> '+response.first_name+' '+response.last_name+'</p><p><b>Gender:</b> '+response.gender+'</p><p><b>Locale:</b> '+response.locale+'</p><p><b>Picture:</b> <img src="'+response.picture.data.url+'"/></p><p><b>FB Profile:</b> <a target="_blank" href="'+response.link+'">click to view profile</a></p>';
-        //salvare utente
+        var json = {
+				accessToken : userAccessToken
+		}
+		$.ajax({
+			type: "POST",
+			url: "http://localhost:8080/recSysApp/rest/facebook/user/save",
+			contentType: "application/json",
+			data: JSON.stringify(json),
+			success: function(response){
+				alert("Success!");
+				$("form").trigger("reset");
+
+			},
+			error: function(result, status, error){
+				alert("Sorry, an error occurred. Please try again later");
+			}
+		})
+        console.log(response);
     });
     
     FB.api('/me/likes', {accessToken : userAccessToken},
     function (response) {
-    	console.log(response);
     	//salvare likes
+    	console.log(response);
     	
     });
     
@@ -69,11 +86,13 @@ $(document).ready(function(){
 	    // Check whether the user already logged in
 		FB.getLoginStatus(function(response) {
 	        if (response.status === 'connected') {
+	        	//get user access token
 	        	var accessToken = response.authResponse.accessToken;
 	        	//display user data
 	            getFbUserData(accessToken);
 	        }
 	        else{
+	        	
 	        	fbLogin();
 	        }
 	    });
@@ -82,4 +101,10 @@ $(document).ready(function(){
 		
 	});
 });
+
+$(document).ajaxStart(function() {
+	  $("#waitGif").show();
+	}).ajaxStop(function() {
+	  $("#waitGif").hide();
+	});
 
