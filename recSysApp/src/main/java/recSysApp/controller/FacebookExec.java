@@ -58,7 +58,8 @@ public class FacebookExec {
 	            	  FacebookPage facebookPage = new FacebookPage(page.getId(), page.getName().replaceAll(" ", "_"), singlePage.getCategory());
 	            	  facebookPageList.add(facebookPage);
 	            	  facebookPageNameList.add(page.getName().replaceAll(" ", "_"));
-	            	  java.nio.file.Path file = Paths.get("../src/main/resources/data/FacebookMovieList.txt");
+	            	  java.nio.file.Path file = Paths.get("src/main/resources/data/FacebookMovieList.txt");
+	            	  System.out.println(file.getRoot());
 				      try {
 						Files.write(file, facebookPageNameList, Charset.forName("UTF-8"));
 					} catch (IOException e) {
