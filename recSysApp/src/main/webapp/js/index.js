@@ -9,16 +9,16 @@ window.fbAsyncInit = function() {
 };
 
 // Facebook login with JavaScript SDK
-function fbLogin() {
-    FB.login(function (response) {
+function fbLogin() {	
+    FB.login(function (response) {    	
         if (response.status == 'connected') {
-            // Get and display the user profile data
-        	var accessToken = response.authResponse.accessToken;
-            getFbUserData(accessToken);
-        } else {
+            // Get the user profile data
+            getFbUserData(response.authResponse.accessToken);            
+        } else {        	
             document.getElementById('status').innerHTML = 'User cancelled login or did not fully authorize.';
-        }
-    }, {scope: 'public_profile,user_likes'});
+        }       
+    },{scope: 'public_profile,user_likes'});
+    
 }
 
 //Fetch the user profile data from facebook
@@ -28,18 +28,18 @@ function getFbUserData(userAccessToken){
         document.getElementById('buttonFacebook').setAttribute("onclick","fbLogout()");
         document.getElementById('status').innerHTML = 'Thanks for logging in, ' + response.first_name + '!';
         document.getElementById('userData').innerHTML = '<p><b>FB ID:</b> '+response.id+'</p><p><b>Name:</b> '+response.first_name+' '+response.last_name+'</p><p><b>Gender:</b> '+response.gender+'</p><p><b>Locale:</b> '+response.locale+'</p><p><b>Picture:</b> <img src="'+response.picture.data.url+'"/></p><p><b>FB Profile:</b> <a target="_blank" href="'+response.link+'">click to view profile</a></p>';
+        
         var json = {
-				accessToken : userAccessToken
+			accessToken : userAccessToken
 		}
+        
 		$.ajax({
 			type: "POST",
-			url: "http://localhost:8080/recSysApp/rest/facebook/user/save",
+			url: "http://localhost:8080/recSysApp/rest/services/facebook/user",
 			contentType: "application/json",
 			data: JSON.stringify(json),
 			success: function(response){
 				alert("Success!");
-				$("form").trigger("reset");
-
 			},
 			error: function(result, status, error){
 				alert("Sorry, an error occurred. Please try again later");
@@ -47,14 +47,7 @@ function getFbUserData(userAccessToken){
 		})
         console.log(response);
     });
-    
-    FB.api('/me/likes', {accessToken : userAccessToken},
-    function (response) {
-    	//salvare likes
-    	console.log(response);
-    	
-    });
-    
+        
 }
 
 // Logout from facebook
@@ -86,19 +79,15 @@ $(document).ready(function(){
 	    // Check whether the user already logged in
 		FB.getLoginStatus(function(response) {
 	        if (response.status === 'connected') {
-	        	//get user access token
-	        	var accessToken = response.authResponse.accessToken;
-	        	//display user data
-	            getFbUserData(accessToken);
+	        	//get user data
+	            getFbUserData(response.authResponse.accessToken);
 	        }
 	        else{
-	        	
+	        	//login
 	        	fbLogin();
 	        }
 	    });
-		
-		
-		
+	
 	});
 });
 
