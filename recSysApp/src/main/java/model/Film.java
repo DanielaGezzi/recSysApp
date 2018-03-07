@@ -8,18 +8,16 @@ public class Film {
 	private String title;
 	private String genre;
 	private List<String> filmingLocation;
+	private List<Float> vector;
 	
 	public Film() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public Film(String id, String title, String genre, List<String> filmingLocation) {
+	public Film(String title) {
 		super();
-		this.id = id;
 		this.title = title;
-		this.genre = genre;
-		this.filmingLocation = filmingLocation;
 	}
 
 	public String getId() {
@@ -54,11 +52,18 @@ public class Film {
 		this.filmingLocation = filmingLocation;
 	}
 
+	public List<Float> getVector() {
+		return vector;
+	}
+
+	public void setVector(List<Float> vector) {
+		this.vector = vector;
+	}
+	
 	@Override
 	public String toString() {
 		return "Film [id=" + id + ", title=" + title + ", genre=" + genre + ", filmingLocation=" + filmingLocation
 				+ "]";
 	}
-	
 	
 }

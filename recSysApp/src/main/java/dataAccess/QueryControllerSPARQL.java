@@ -12,6 +12,8 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.sparql.engine.http.QueryEngineHTTP;
 
+import model.Film;
+
 
 public class QueryControllerSPARQL implements QueryController {
 	
@@ -38,8 +40,8 @@ public class QueryControllerSPARQL implements QueryController {
 	}
 	
 	@Override
-	public List<String> getCandidateFilms(String endPoint, String location){
-		List<String> result = new ArrayList<String>();
+	public List<Film> getCandidateFilms(String endPoint, String location){
+		List<Film> result = new ArrayList<Film>();
 		String queryString = generateQuery(endPoint, location);
 		Query query;
 		
@@ -54,8 +56,9 @@ public class QueryControllerSPARQL implements QueryController {
 			      Literal filmTitle = soln.getLiteral("film_label");
 			      //Literal filmLocation = soln.getLiteral("loc_label");
 			      byte[] bytes = filmTitle.toString().getBytes("ISO_8859_1");
-			      String title_decoded = new String(bytes, "UTF-8");    
-			      result.add(Normalizer.normalize(title_decoded,  Normalizer.Form.NFD).replaceAll(" ", "_"));
+			      String title_decoded = new String(bytes, "UTF-8");
+			      Film film = new Film(Normalizer.normalize(title_decoded,  Normalizer.Form.NFD).replaceAll(" ", "_"));
+			      result.add(film);
 			    }
 		} 
 		catch (Exception e) {

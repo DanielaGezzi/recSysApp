@@ -11,6 +11,8 @@ import com.restfb.Version;
 import com.restfb.types.Page;
 import com.restfb.types.User;
 
+import facade.FacadeFacebookPage;
+import facade.FacadeFacebookPageImpl;
 import model.FacebookPage;
 
 public class FacebookExec {
@@ -35,7 +37,8 @@ public class FacebookExec {
 	
 	public void getFacebookUserLikes() {
 		
-    	List<FacebookPage> facebookPageList = new ArrayList<FacebookPage>();		
+    	List<FacebookPage> facebookPageList = new ArrayList<FacebookPage>();	
+    	FacadeFacebookPage facadeFbPage = new FacadeFacebookPageImpl();
 	
 		//get user likes info try catch
 		Connection<Page> likes = fbClient.fetchConnection("me/likes", Page.class);
@@ -45,16 +48,14 @@ public class FacebookExec {
 	              Page singlePage = fbClient.fetchObject(page.getId(), Page.class, 
 	            		  Parameter.with("fields", "category"));
 	              if(singlePage.getCategory().equals("Movie") | 
-	            		  singlePage.getCategory().equals("TV Show") ) {
+	            		  singlePage.getCategory().equals("TV Show") ) {	            	  		
 	            	  FacebookPage facebookPage = new FacebookPage(page.getId(), page.getName().replaceAll(" ", "_"), singlePage.getCategory());
 	            	  facebookPageList.add(facebookPage);
 	            	  
-	                  //salva fbpage ...
-
 	              }
 	          }
         }
-        //System.out.println(facebookPageList);
+        System.out.println(facebookPageList);
         
 		
 	}

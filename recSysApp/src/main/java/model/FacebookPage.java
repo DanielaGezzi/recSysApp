@@ -1,11 +1,15 @@
 package model;
 
+import java.util.List;
+
 public class FacebookPage {
 	
 	private String id;
 	private String name;
 	private String category;
+	private List<Float> vector;
 	
+
 	public FacebookPage(String id, String name, String category) {
 		super();
 		this.id = id;
@@ -32,6 +36,14 @@ public class FacebookPage {
 
 	public void setCategory(String category) {
 		this.category = category;
+	}
+	
+	public List<Float> getVector() {
+		return vector;
+	}
+
+	public void setVector(List<Float> vector) {
+		this.vector = vector;
 	}
 
 	@Override

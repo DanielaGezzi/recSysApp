@@ -5,18 +5,21 @@ import java.util.List;
 
 import dataAccess.QueryController;
 import dataAccess.QueryControllerSPARQL;
+import facade.FacadeFilm;
+import facade.FacadeFilmImpl;
+import model.Film;
 
 public class GenerationExec {
 	
 	/**
 	 *  
 	 * @param     	
-	 * @return list of candidate resources from LOD
+	 * @return list of candidate resources from LOD (film with vector from fastText)
 	 */
-	public List<String> getRelatedResources(String Location) {
-		List<String> result = new ArrayList<String>();
-		QueryController queryController = new QueryControllerSPARQL();
-		result = queryController.getCandidateFilms(QueryControllerSPARQL.ENDPOINT_LinkedMDB, Location);
+	public List<Film> getRelatedResources(String location) {
+		List<Film> result = new ArrayList<Film>();
+		FacadeFilm facadeFilm = new FacadeFilmImpl();
+		result = facadeFilm.getCandidateFilms(location);
 
 		return result;
 		

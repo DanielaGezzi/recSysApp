@@ -6,6 +6,6 @@ import model.Film;
 
 public interface QueryController {
 	
-	List<String> getCandidateFilms(String endPoint, String Location);
+	List<Film> getCandidateFilms(String endPoint, String Location);
 
 }
