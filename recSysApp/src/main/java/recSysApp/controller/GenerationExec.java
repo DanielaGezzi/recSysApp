@@ -16,7 +16,7 @@ public class GenerationExec {
 	 * @param     	
 	 * @return list of candidate resources from LOD (film with vector from fastText)
 	 */
-	public List<Film> getRelatedResources(String location) {
+	public List<Film> getRelatedFilm(String location) {
 		List<Film> result = new ArrayList<Film>();
 		FacadeFilm facadeFilm = new FacadeFilmImpl();
 		result = facadeFilm.getCandidateFilms(location);
