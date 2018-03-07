@@ -50,7 +50,7 @@ public class FacebookExec {
 	              if(singlePage.getCategory().equals("Movie") | 
 	            		  singlePage.getCategory().equals("TV Show") ) {	            	  		
 	            	  FacebookPage facebookPage = new FacebookPage(page.getId(), page.getName().replaceAll(" ", "_"), singlePage.getCategory());
-	            	  facebookPageList.add(facebookPage);
+	            	  facebookPageList.add(facadeFbPage.saveFacebookPage(facebookPage));
 	            	  
 	              }
 	          }
