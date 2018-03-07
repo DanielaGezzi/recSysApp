@@ -14,7 +14,7 @@ public class FacadeFilmImpl implements FacadeFilm {
 	public List<Film> getCandidateFilms(String location){
 		
 		List<Film> result = new ArrayList<Film>();
-		FastText fastText = new FastText();
+		FastText fastText = FastText.getFastText();
 		QueryController queryController = new QueryControllerSPARQL();
 		result = queryController.getCandidateFilms(QueryControllerSPARQL.ENDPOINT_LinkedMDB, location);
 		

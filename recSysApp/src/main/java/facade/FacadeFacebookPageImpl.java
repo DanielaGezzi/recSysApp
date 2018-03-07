@@ -6,7 +6,7 @@ import utils.FastText;
 public class FacadeFacebookPageImpl implements FacadeFacebookPage {
 	
 	public FacebookPage saveFacebookPage(FacebookPage facebookPage) {
-		FastText fastText = new FastText();
+		FastText fastText = FastText.getFastText();
 		try {
 		facebookPage.setVector(fastText.getVector(facebookPage.getName()));
 		}catch(Exception e){
@@ -14,7 +14,7 @@ public class FacadeFacebookPageImpl implements FacadeFacebookPage {
 		}
 		
 		//save local...
-		
+		System.out.println(facebookPage);
 		return facebookPage;
 	}
 

@@ -48,8 +48,10 @@ public class FacebookPage {
 
 	@Override
 	public String toString() {
-		return "FacebookPage [id=" + id + ", name=" + name + ", category=" + category + "]";
+		return "FacebookPage [id=" + id + ", name=" + name + ", category=" + category + ", vector=" + vector + "]";
 	}
+
+
 
 	
 }
