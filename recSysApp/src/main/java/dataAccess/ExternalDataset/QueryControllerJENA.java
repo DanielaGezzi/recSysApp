@@ -1,6 +1,6 @@
-package dataAccess;
+package dataAccess.ExternalDataset;
 
-import java.text.Normalizer;
+/*import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,16 +15,15 @@ import org.apache.jena.sparql.engine.http.QueryEngineHTTP;
 import model.Film;
 
 
-public class QueryControllerSPARQL implements QueryController {
+public class QueryControllerJENA implements QueryController {
 	
 	public final static String ENDPOINT_LinkedMDB = "http://data.linkedmdb.org/sparql"; //endPoint URL LinkedMDB
 	//private String endPointDBPedia = "http://data.linkedmdb.org/sparql"; //endPoint URL DBPedia
 	//private String endPointWikiData = "http://data.linkedmdb.org/sparql"; //endPoint URL WikiData	
 
-	
-	private String generateQuery(String endPoint, String location) {
+	public String generateQuery(String endPoint, String location) {
 		String queryResult = null;
-		if(endPoint == QueryControllerSPARQL.ENDPOINT_LinkedMDB) {
+		if(endPoint == QueryControllerJENA.ENDPOINT_LinkedMDB) {
 			queryResult = "PREFIX movie: <http://data.linkedmdb.org/resource/movie/>" +
 						  "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>" +
 						  "SELECT DISTINCT ?film ?film_label ?loc_label " + 
@@ -72,4 +71,4 @@ public class QueryControllerSPARQL implements QueryController {
 	
 	
 
-}
+}*/

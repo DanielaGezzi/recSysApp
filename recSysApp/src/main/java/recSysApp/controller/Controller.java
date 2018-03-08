@@ -16,10 +16,16 @@ import javax.ws.rs.core.Response;
 import com.google.gson.Gson;
 
 import model.Film;
+import model.User;
 
 
 @Path("/services")
 public class Controller {
+
+	// sarebbe opportuno avere un client REST che stora le informazioni utente
+	// e che per ogni richiesta al server REST invia sempre le info di autenticazione
+	// in modo da essere autenticato ad ogni richiesta.
+	// In questo modo viene preservata la condizione stateless come richiesto dal paradigma REST
 
 	@POST
 	@Path("/facebook/user")	
@@ -32,9 +38,7 @@ public class Controller {
     	String accessToken = map.get("accessToken");
     	
     	FacebookExec fbExecutioner = new FacebookExec(accessToken);
-		fbExecutioner.getFacebookUser();
-		fbExecutioner.getFacebookUserLikes();		
-		
+		fbExecutioner.getFacebookUserInfo();
 		return Response.status(200).build();
 	}
 	
@@ -45,7 +49,10 @@ public class Controller {
 		
 		List<Film> filmList = new ArrayList<Film>();
 		GenerationExec genExecutioner = new GenerationExec();
-		filmList = genExecutioner.getRelatedFilm(locationName);
+		filmList = genExecutioner.getRelatedFilms(locationName);
+		//RankingExec rankExecutioner = new RankingExec();
+		//filmList = rankExecutioner.rankFilms(filmList, this.user);
+
 		
 		return filmList;
 	}

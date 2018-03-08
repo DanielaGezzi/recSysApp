@@ -96,18 +96,26 @@
 		    <version>2.8.2</version>
 		</dependency>
 		
-		<dependency>
+		<!--  <dependency>
 		    <groupId>org.apache.jena</groupId>
 		    <artifactId>apache-jena-libs</artifactId>
 		    <type>pom</type>
 		    <version>3.5.0</version>
-	  	</dependency>
+	  	</dependency>-->
 		  	
 		<dependency>
 			<groupId>com.github.vinhkhuc</groupId>
 			<artifactId>jfasttext</artifactId>
 			<version>0.3</version>
 		</dependency>	    
+		
+		<!-- https://mvnrepository.com/artifact/com.ontotext.graphdb/graphdb-free-runtime-->
+		<dependency>
+		    <groupId>com.ontotext.graphdb</groupId>
+		    <artifactId>graphdb-free-runtime</artifactId>
+		    <version>8.4.1</version>
+		</dependency> 
+		
 
     </dependencies>
     <properties>

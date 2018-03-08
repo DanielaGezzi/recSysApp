@@ -13,29 +13,32 @@ import com.restfb.types.User;
 
 import facade.FacadeFacebookPage;
 import facade.FacadeFacebookPageImpl;
+import facade.FacadeUser;
+import facade.FacadeUserImpl;
 import model.FacebookPage;
 
 public class FacebookExec {
 	
-	private String accessToken;
 	private FacebookClient fbClient;
 	
 	public FacebookExec(String accessToken){
-		this.accessToken = accessToken;
 		this.fbClient = new DefaultFacebookClient(accessToken, Version.LATEST);
 	}
 
-	public void getFacebookUser() {
-    			
+	public void getFacebookUserInfo() {
+    	//FacadeUser facadeUser = new FacadeUserImpl();
 		//get user info try catch
 		User user = fbClient.fetchObject("me", User.class);
-		model.User myUser = new model.User(user.getId(), user.getName(), accessToken);
+		//save user by facadeUser -> userSPARQL -> userGraphDB in local DB 
+		//facadeUser.saveUserfromFacebook(user);
+		//add link "likes" for every facebookPage facadeUser -> userSPARQL -> userGraphDB in local DB
+		List<FacebookPage> facebookPageList = getFacebookUserLikes(); 		
+
 		
-		//salva utente...
 		
 	}
 	
-	public void getFacebookUserLikes() {
+	private List<FacebookPage> getFacebookUserLikes() {
 		
     	List<FacebookPage> facebookPageList = new ArrayList<FacebookPage>();	
     	FacadeFacebookPage facadeFbPage = new FacadeFacebookPageImpl();
@@ -55,7 +58,7 @@ public class FacebookExec {
 	              }
 	          }
         }
-        System.out.println(facebookPageList);
+        return facebookPageList;
         
 		
 	}

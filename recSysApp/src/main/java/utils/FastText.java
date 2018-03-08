@@ -8,13 +8,10 @@ import com.github.jfasttext.JFastText;
 public class FastText {
 	private static FastText instance = null;
 	private JFastText jft = new JFastText();
-	private final String model = "D:/Documenti/workspace_test/.metadata/.plugins/org.eclipse.wst.server.core/tmp0/wtpwebapps/recSysApp/WEB-INF/classes/wiki.en.bin";
 	    
 		private FastText() {
-			//File file = new File(getClass().getClassLoader().getResource("wiki.en.bin").getFile());
-			//String modelPath = file.getAbsolutePath();
-			//System.out.println(modelPath);
-			this.jft.loadModel(model);
+			File file = new File(getClass().getClassLoader().getResource("wiki.en.bin").getFile());
+			this.jft.loadModel(file.getAbsolutePath());
 		}
 		
 		public static synchronized FastText getFastText() {

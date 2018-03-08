@@ -1,23 +1,23 @@
 package model;
 
+import java.util.List;
+
 public class User {
 
 	private String id;
 	private String facebookID;
 	private String name;
 	private String surname;
-	private String facebookUserAccessToken;
-
 	
 	public User() {
 		super();	
 	}
 	
-	public User(String facebookID, String name, String facebookUserAccessToken) {
+	public User(String facebookID, String name, String surname) {
 		super();
 		this.facebookID = facebookID;
-		this.facebookUserAccessToken = facebookUserAccessToken;
 		this.name = name;
+		this.surname = surname;
 	}
 	
 	
@@ -37,14 +37,6 @@ public class User {
 		this.surname = surname;
 	}
 
-	public String getFacebookUserAccessToken() {
-		return facebookUserAccessToken;
-	}
-
-	public void setFacebookUserAccessToken(String facebookUserAccessToken) {
-		this.facebookUserAccessToken = facebookUserAccessToken;
-	}
-
 	public String getName() {
 		return name;
 	}
@@ -57,10 +49,12 @@ public class User {
 	public void setFacebookID(String facebookID) {
 		this.facebookID = facebookID;
 	}
+
 	
 	@Override
 	public String toString() {
-		return "User [facebookID=" + facebookID + ", userAccessToken=" + facebookUserAccessToken + ", name=" + name + "]";
+		return "User [facebookID=" + facebookID + ", name=" + name + ", surname=" + surname + "]";
 	}
+
 	
 }
