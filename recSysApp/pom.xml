@@ -110,6 +110,7 @@
 		</dependency>	    
 		
 		<!-- https://mvnrepository.com/artifact/com.ontotext.graphdb/graphdb-free-runtime-->
+		<!-- contains RDF4j -->
 		<dependency>
 		    <groupId>com.ontotext.graphdb</groupId>
 		    <artifactId>graphdb-free-runtime</artifactId>

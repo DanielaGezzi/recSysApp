@@ -68,5 +68,20 @@ public class QueryControllerRDF4J implements QueryController {
 	}
 
 }
+/*
+ * 
+ * query su LMDB con filter
+SELECT ?film (COUNT(?film) as ?count)
+WHERE
+{ 
+?film a movie:film . 
+?film movie:featured_film_location ?location .
+?location movie:film_location_name ?loc_label .
+FILTER (str(?loc_label) = "Rome" || str(?loc_label) = "Italy" )
+}
 
-//"title":"\"The_Italian_Job\"^^<http://www.w3.org/2001/XMLSchema#string>"
+*
+*
+*
+*/
+
