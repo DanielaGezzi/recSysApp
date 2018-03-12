@@ -47,9 +47,7 @@ public class QueryControllerRDF4J implements QueryController {
 			
 			for (;resultSet.hasNext();) {
 			      BindingSet soln = resultSet.next();
-			      //RDFNode filmUri = soln.get("film");
 			      String filmTitle = soln.getValue("film_label").stringValue();
-			      //Literal filmLocation = soln.getLiteral("loc_label");
 			      byte[] bytes = filmTitle.toString().getBytes("ISO_8859_1");
 			      String title_decoded = new String(bytes, "UTF-8");
 			      Film film = new Film(Normalizer.normalize(title_decoded,  Normalizer.Form.NFD).replaceAll(" ", "_"));
@@ -82,6 +80,19 @@ FILTER (str(?loc_label) = "Rome" || str(?loc_label) = "Italy" )
 
 *
 *
-*
+* query su wikidata (4030)
+* 
+SELECT ?film ?filmLabel WHERE {
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+  ?film wdt:P31 wd:Q11424.
+  ?film wdt:P915 ?location.
+  ?location rdfs:label ?locationLabel.
+  #FILTER (LANG(?locationLabel) = "en") .
+  FILTER (str(?locationLabel) = "Rome")
+}
+
 */
+
+
+
 
