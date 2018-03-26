@@ -4,24 +4,24 @@ import java.util.List;
 
 public class FacebookPage {
 	
-	private String id;
+	private String facebookID;
 	private String name;
 	private String category;
 	private List<Float> vector;
 	
 
-	public FacebookPage(String id, String name, String category) {
+	public FacebookPage(String facebookID, String name, String category) {
 		super();
-		this.id = id;
+		this.facebookID = facebookID;
 		this.name = name;
 		this.category = category;
 	}
 	
-	public String getId() {
-		return id;
+	public String getFacebookID() {
+		return facebookID;
 	}
-	public void setId(String id) {
-		this.id = id;
+	public void setFacebookID(String facebookID) {
+		this.facebookID = facebookID;
 	}
 	public String getName() {
 		return name;
@@ -48,7 +48,7 @@ public class FacebookPage {
 
 	@Override
 	public String toString() {
-		return "FacebookPage [id=" + id + ", name=" + name + ", category=" + category + ", vector=" + vector + "]";
+		return "FacebookPage [id=" + facebookID + ", name=" + name + ", category=" + category + ", vector=" + vector + "]";
 	}
 
 

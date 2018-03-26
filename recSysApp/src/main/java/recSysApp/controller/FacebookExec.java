@@ -26,13 +26,14 @@ public class FacebookExec {
 	}
 
 	public void getFacebookUserInfo() {
-    	//FacadeUser facadeUser = new FacadeUserImpl();
+    	FacadeUser facadeUser = new FacadeUserImpl();
 		//get user info try catch
-		User user = fbClient.fetchObject("me", User.class);
-		//save user by facadeUser -> userSPARQL -> userGraphDB in local DB 
-		//facadeUser.saveUserfromFacebook(user);
-		//add link "likes" for every facebookPage facadeUser -> userSPARQL -> userGraphDB in local DB
-		List<FacebookPage> facebookPageList = getFacebookUserLikes(); 		
+		User user = fbClient.fetchObject("me", User.class, 
+				Parameter.with("fields", "id,first_name,last_name"));
+
+		facadeUser.saveUserfromFacebook(user); //save user in local DB
+		List<FacebookPage> facebookPageList = getFacebookUserLikes();
+		facadeUser.saveUserLikes(user, facebookPageList); //save user <--> fbpage in localDB
 
 		
 		
@@ -52,8 +53,8 @@ public class FacebookExec {
 	            		  Parameter.with("fields", "category"));
 	              if(singlePage.getCategory().equals("Movie") | 
 	            		  singlePage.getCategory().equals("TV Show") ) {	            	  		
-	            	  FacebookPage facebookPage = new FacebookPage(page.getId(), page.getName().replaceAll(" ", "_"), singlePage.getCategory());
-	            	  facebookPageList.add(facadeFbPage.saveFacebookPage(facebookPage));
+	            	  FacebookPage facebookPage = new FacebookPage(page.getId(), page.getName(), singlePage.getCategory());
+	            	  facebookPageList.add(facadeFbPage.saveFacebookPage(facebookPage)); //save fbPage
 	            	  
 	              }
 	          }
