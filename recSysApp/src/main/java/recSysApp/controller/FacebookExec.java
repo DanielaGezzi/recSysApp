@@ -16,6 +16,7 @@ import facade.FacadeFacebookPageImpl;
 import facade.FacadeUser;
 import facade.FacadeUserImpl;
 import model.FacebookPage;
+import utils.FastText;
 
 public class FacebookExec {
 	
@@ -36,6 +37,36 @@ public class FacebookExec {
 		facadeUser.saveUserLikes(user, facebookPageList); //save user <--> fbpage in localDB
 
 		
+		
+	}
+	
+	public List<FacebookPage> getFacebookUserLikesTest() {
+		
+		FastText fastText = FastText.getFastText();
+    	List<FacebookPage> facebookPageList = new ArrayList<FacebookPage>();	
+	
+		//get user likes info try catch
+		Connection<Page> likes = fbClient.fetchConnection("me/likes", Page.class);
+		
+        for(List<Page> userLikes: likes) {
+	          for ( Page page : userLikes){		         
+	              Page singlePage = fbClient.fetchObject(page.getId(), Page.class, 
+	            		  Parameter.with("fields", "category"));
+	              if(singlePage.getCategory().equals("Movie") | 
+	            		  singlePage.getCategory().equals("TV Show") ) {	            	  		
+	            	  FacebookPage facebookPage = new FacebookPage(page.getId(), page.getName(), singlePage.getCategory());
+	            	  try {
+	          			facebookPage.setVector(fastText.getVector(facebookPage.getName().replaceAll(" ", "_")));
+	          			}catch(Exception e){
+	          				e.printStackTrace();
+	          			}
+	            	  facebookPageList.add(facebookPage); //save fbPage
+	            	  
+	              }
+	          }
+        }
+        return facebookPageList;
+        
 		
 	}
 	

@@ -15,8 +15,8 @@ import javax.ws.rs.core.Response;
 
 import com.google.gson.Gson;
 
+import model.FacebookPage;
 import model.Film;
-import model.User;
 
 
 @Path("/services")
@@ -42,16 +42,25 @@ public class Controller {
 		return Response.status(200).build();
 	}
 	
+	
 	@GET
-	@Path("/film/location/{location}")	
+	@Path("/film/location/{location}")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-	public List<Film> getFilmByLocationName(@PathParam("location") String locationName) {
+	public List<Film> getFilmByLocationName(@PathParam("location") String locationName , String queryParam) {
 		
+		Gson gson = new Gson();
+		@SuppressWarnings("unchecked")
+		Map<String, String> map = gson.fromJson(queryParam, Map.class);
+    	String accessToken = map.get("accessToken");
+    	
+    	FacebookExec fbExecutioner = new FacebookExec(accessToken);
+		List<FacebookPage> facebookPageList = fbExecutioner.getFacebookUserLikesTest();
 		List<Film> filmList = new ArrayList<Film>();
 		GenerationExec genExecutioner = new GenerationExec();
 		filmList = genExecutioner.getRelatedFilms(locationName);
-		//RankingExec rankExecutioner = new RankingExec();
-		//filmList = rankExecutioner.rankFilms(filmList, this.user);
+		RankingExec rankExecutioner = new RankingExec();
+		filmList = rankExecutioner.rankFilms(filmList, facebookPageList);
 
 		
 		return filmList;

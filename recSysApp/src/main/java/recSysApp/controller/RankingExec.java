@@ -20,21 +20,21 @@ public class RankingExec {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public List<Film> rankFilms(List<Film> inputList, User user){
+	public List<Film> rankFilms(List<Film> filmInputList, List<FacebookPage> facebookPageInputList){
 		
 		List<Film> resultList = new ArrayList<Film>();
 		
-		//per ogni film nella lista resultList calcolo la simlarità con tutte le pagine
+		//per ogni film nella lista resultList calcolo la similarità con tutte le pagine
 		//associate all'utente e faccio una media che rappresenterà quanto ogni film
 		//si avvicina ai gusti dell'utente.
 		
 		Map<Film, Double> rankedFilms = new LinkedHashMap<Film, Double>();
 		
-		for(Film film : inputList) {
+		for(Film film : filmInputList) {
 			int i = 0;
 			double averageNum = 0;
 			float[] floatFilmArray = ArrayUtils.toPrimitive(film.getVector().toArray(new Float[film.getVector().size()]), 0.0F);
-			for(FacebookPage fbPage : fbPageList) {
+			for(FacebookPage fbPage : facebookPageInputList) {
 				float[] floatFilmfbPage = ArrayUtils.toPrimitive(fbPage.getVector().toArray(new Float[fbPage.getVector().size()]), 0.0F);
 				averageNum +=  cosineSimilarity(floatFilmArray, floatFilmfbPage);
 				i++;

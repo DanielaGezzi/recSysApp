@@ -89,6 +89,42 @@ $(document).ready(function(){
 	    });
 	
 	});
+	
+	$("#buttonSearchFilm").on("click", function(){
+			
+		    // Check whether the user already logged in
+			FB.getLoginStatus(function(response) {
+		        if (response.status === 'connected') {
+		        		        		
+		        		 var json = {
+		        					accessToken : response.authResponse.accessToken,
+		        					location: "Rome"
+		        				}
+		        		        
+		        				$.ajax({
+		        					type: "GET",
+		        					url: "http://localhost:8080/recSysApp/rest/services/film/location/Rome",
+		        					contentType: "application/json",
+		        					data: JSON.stringify(json),
+		        					success: function(response){
+		        						alert("Success!");
+		        					},
+		        					error: function(result, status, error){
+		        						alert("Sorry, an error occurred. Please try again later");
+		        					}
+		        				})
+		        				console.log(response);
+		        		 	
+		        
+		        }
+		        else{
+		        	//login
+		        	fbLogin();
+		        }
+		    });
+		
+		});
+	
 });
 
 $(document).ajaxStart(function() {
