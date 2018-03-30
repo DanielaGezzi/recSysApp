@@ -44,25 +44,41 @@ public class Controller {
 	
 	
 	@GET
-	@Path("/film/location/{location}")
-    @Consumes(MediaType.APPLICATION_JSON)
+	@Path("/film/location/{location}")	
     @Produces(MediaType.APPLICATION_JSON)
-	public List<Film> getFilmByLocationName(@PathParam("location") String locationName , String queryParam) {
+	public List<Film> getFilmByLocationName(@PathParam("location") String locationName) {
+		
+		List<Film> filmList = new ArrayList<Film>();
+		GenerationExec genExecutioner = new GenerationExec();
+		filmList = genExecutioner.getRelatedFilms(locationName);
+		//RankingExec rankExecutioner = new RankingExec();
+		//filmList = rankExecutioner.rankFilms(filmList, this.user);
+
+		
+		return filmList;
+	}
+	
+	@POST
+	@Path("/test")
+    @Consumes(MediaType.APPLICATION_JSON)
+	public Response getFilmByLocationNameTest(String queryParam) {
 		
 		Gson gson = new Gson();
 		@SuppressWarnings("unchecked")
 		Map<String, String> map = gson.fromJson(queryParam, Map.class);
     	String accessToken = map.get("accessToken");
+    	String location = map.get("location");
     	
-    	FacebookExec fbExecutioner = new FacebookExec(accessToken);
+    	System.out.println(location);
+    	/*FacebookExec fbExecutioner = new FacebookExec(accessToken);
 		List<FacebookPage> facebookPageList = fbExecutioner.getFacebookUserLikesTest();
 		List<Film> filmList = new ArrayList<Film>();
 		GenerationExec genExecutioner = new GenerationExec();
-		filmList = genExecutioner.getRelatedFilms(locationName);
+		filmList = genExecutioner.getRelatedFilms(location);
 		RankingExec rankExecutioner = new RankingExec();
-		filmList = rankExecutioner.rankFilms(filmList, facebookPageList);
+		filmList = rankExecutioner.rankFilms(filmList, facebookPageList);*/
 
 		
-		return filmList;
+		return Response.status(200).build();
 	}
 }

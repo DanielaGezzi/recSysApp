@@ -95,15 +95,15 @@ $(document).ready(function(){
 		    // Check whether the user already logged in
 			FB.getLoginStatus(function(response) {
 		        if (response.status === 'connected') {
-		        		        		
+    					console.log(response);
 		        		 var json = {
 		        					accessToken : response.authResponse.accessToken,
 		        					location: "Rome"
 		        				}
 		        		        
 		        				$.ajax({
-		        					type: "GET",
-		        					url: "http://localhost:8080/recSysApp/rest/services/film/location/Rome",
+		        					type: "POST",
+		        					url: "http://localhost:8080/recSysApp/rest/services/test",
 		        					contentType: "application/json",
 		        					data: JSON.stringify(json),
 		        					success: function(response){
@@ -113,7 +113,6 @@ $(document).ready(function(){
 		        						alert("Sorry, an error occurred. Please try again later");
 		        					}
 		        				})
-		        				console.log(response);
 		        		 	
 		        
 		        }
