@@ -53,15 +53,14 @@ public class Controller {
 		filmList = genExecutioner.getRelatedFilms(locationName);
 		//RankingExec rankExecutioner = new RankingExec();
 		//filmList = rankExecutioner.rankFilms(filmList, this.user);
-
 		
 		return filmList;
 	}
 	
-	@POST
+	@GET
 	@Path("/test")
-    @Consumes(MediaType.APPLICATION_JSON)
-	public Response getFilmByLocationNameTest(String queryParam) {
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<Film> getFilmByLocationNameTest(String queryParam) {
 		
 		Gson gson = new Gson();
 		@SuppressWarnings("unchecked")
@@ -70,15 +69,15 @@ public class Controller {
     	String location = map.get("location");
     	
     	System.out.println(location);
-    	/*FacebookExec fbExecutioner = new FacebookExec(accessToken);
+    	FacebookExec fbExecutioner = new FacebookExec(accessToken);
 		List<FacebookPage> facebookPageList = fbExecutioner.getFacebookUserLikesTest();
 		List<Film> filmList = new ArrayList<Film>();
 		GenerationExec genExecutioner = new GenerationExec();
 		filmList = genExecutioner.getRelatedFilms(location);
 		RankingExec rankExecutioner = new RankingExec();
-		filmList = rankExecutioner.rankFilms(filmList, facebookPageList);*/
+		filmList = rankExecutioner.rankFilms(filmList, facebookPageList);
 
 		
-		return Response.status(200).build();
+		return filmList;
 	}
 }

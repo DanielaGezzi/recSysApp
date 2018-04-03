@@ -8,6 +8,7 @@ window.fbAsyncInit = function() {
     });
 };
 
+
 // Facebook login with JavaScript SDK
 function fbLogin() {	
     FB.login(function (response) {    	
@@ -20,6 +21,7 @@ function fbLogin() {
     },{scope: 'public_profile,user_likes'});
     
 }
+
 
 //Fetch the user profile data from facebook
 function getFbUserData(userAccessToken){
@@ -50,6 +52,7 @@ function getFbUserData(userAccessToken){
         
 }
 
+
 // Logout from facebook
 function fbLogout() {
     FB.logout(function(response) {
@@ -60,6 +63,7 @@ function fbLogout() {
         document.getElementById('status').innerHTML = 'You have successfully logout from Facebook.';
     });
 }
+
 
 $(document).ready(function(){
 	
@@ -102,10 +106,11 @@ $(document).ready(function(){
 		        				}
 		        		        
 		        				$.ajax({
-		        					type: "POST",
+		        					type: "GET",
 		        					url: "http://localhost:8080/recSysApp/rest/services/test",
 		        					contentType: "application/json",
 		        					data: JSON.stringify(json),
+		        					dataType: "jsonp",
 		        					success: function(response){
 		        						alert("Success!");
 		        					},
@@ -125,6 +130,7 @@ $(document).ready(function(){
 		});
 	
 });
+
 
 $(document).ajaxStart(function() {
 	  $("#waitGif").show();

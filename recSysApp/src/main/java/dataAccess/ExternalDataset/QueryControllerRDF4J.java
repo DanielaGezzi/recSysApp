@@ -28,6 +28,7 @@ public class QueryControllerRDF4J implements QueryController {
 							  	"		?film a movie:film ." + 
 							  	"		?film movie:featured_film_location ?location ." + 
 							  	"		?location movie:film_location_name ?loc_label ." + 
+							  	"		?film rdfs:label ?film_label" +
 							  	"		FILTER (str(?loc_label) = \""+ location +"\" || str(?loc_label) = \"Italy\" )" + 
 							  	"}";
 		}
