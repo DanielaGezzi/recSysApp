@@ -61,7 +61,7 @@ public class Controller {
 	@Path("/test")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<Film> getFilmByLocationNameTest(String queryParam) {
-		
+		System.out.println("test:" + queryParam);
 		Gson gson = new Gson();
 		@SuppressWarnings("unchecked")
 		Map<String, String> map = gson.fromJson(queryParam, Map.class);

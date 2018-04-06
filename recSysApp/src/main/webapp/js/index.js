@@ -108,9 +108,9 @@ $(document).ready(function(){
 		        				$.ajax({
 		        					type: "GET",
 		        					url: "http://localhost:8080/recSysApp/rest/services/test",
-		        					contentType: "application/json",
-		        					data: JSON.stringify(json),
-		        					dataType: "jsonp",
+		        					contentType: "application/json; charset=utf-8",
+		        					data: encodeURIComponent(JSON.stringify(json)),
+		        					dataType: "json",
 		        					success: function(response){
 		        						alert("Success!");
 		        					},
