@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -30,11 +31,11 @@ public class Controller {
 	@POST
 	@Path("/facebook/user")	
     @Consumes(MediaType.APPLICATION_JSON)
-	public Response saveFacebookUser(String queryParam) {
+	public Response saveFacebookUser(String requestPayload) {
 
 		Gson gson = new Gson();
 		@SuppressWarnings("unchecked")
-		Map<String, String> map = gson.fromJson(queryParam, Map.class);
+		Map<String, String> map = gson.fromJson(requestPayload, Map.class);
     	String accessToken = map.get("accessToken");
     	
     	FacebookExec fbExecutioner = new FacebookExec(accessToken);
@@ -44,7 +45,6 @@ public class Controller {
 	
 	
 	@GET
-	@Path("/film/location/{location}")	
     @Produces(MediaType.APPLICATION_JSON)
 	public List<Film> getFilmByLocationName(@PathParam("location") String locationName) {
 		
@@ -60,15 +60,10 @@ public class Controller {
 	@GET
 	@Path("/test")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Film> getFilmByLocationNameTest(String queryParam) {
-		System.out.println("test:" + queryParam);
-		Gson gson = new Gson();
-		@SuppressWarnings("unchecked")
-		Map<String, String> map = gson.fromJson(queryParam, Map.class);
-    	String accessToken = map.get("accessToken");
-    	String location = map.get("location");
+	public List<Film> getFilmByLocationNameTest(@QueryParam("accessToken") String accessToken,
+												@QueryParam("location") String location) {
     	
-    	System.out.println(location);
+		System.out.println(location);
     	FacebookExec fbExecutioner = new FacebookExec(accessToken);
 		List<FacebookPage> facebookPageList = fbExecutioner.getFacebookUserLikesTest();
 		List<Film> filmList = new ArrayList<Film>();
@@ -77,7 +72,6 @@ public class Controller {
 		RankingExec rankExecutioner = new RankingExec();
 		filmList = rankExecutioner.rankFilms(filmList, facebookPageList);
 
-		
 		return filmList;
 	}
 }
