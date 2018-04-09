@@ -11,7 +11,6 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import model.FacebookPage;
 import model.Film;
-import model.User;
 
 public class RankingExec {
 

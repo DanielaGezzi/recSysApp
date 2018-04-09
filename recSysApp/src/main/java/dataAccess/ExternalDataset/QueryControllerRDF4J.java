@@ -91,7 +91,7 @@ public class QueryControllerRDF4J implements QueryController {
 			      String filmTitle = soln.getValue("film_label").stringValue();
 			      byte[] bytes = filmTitle.toString().getBytes("ISO_8859_1");
 			      String title_decoded = new String(bytes, "UTF-8");
-			      Film film = new Film(Normalizer.normalize(title_decoded,  Normalizer.Form.NFD).replaceAll(" ", "_"));
+			      Film film = new Film(Normalizer.normalize(title_decoded,  Normalizer.Form.NFD));
 			      result.add(film);
 			    }
 		} 

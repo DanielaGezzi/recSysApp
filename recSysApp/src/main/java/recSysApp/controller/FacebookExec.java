@@ -35,8 +35,6 @@ public class FacebookExec {
 		facadeUser.saveUserfromFacebook(user); //save user in local DB
 		List<FacebookPage> facebookPageList = getFacebookUserLikes();
 		facadeUser.saveUserLikes(user, facebookPageList); //save user <--> fbpage in localDB
-
-		
 		
 	}
 	
