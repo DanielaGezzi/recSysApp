@@ -45,6 +45,7 @@ public class Controller {
 	
 	
 	@GET
+	@Path("/film/location/{location}")
     @Produces(MediaType.APPLICATION_JSON)
 	public List<Film> getFilmByLocationName(@PathParam("location") String locationName) {
 		
@@ -63,7 +64,6 @@ public class Controller {
 	public List<Film> getFilmByLocationNameTest(@QueryParam("accessToken") String accessToken,
 												@QueryParam("location") String location) {
     	
-		System.out.println(location);
     	FacebookExec fbExecutioner = new FacebookExec(accessToken);
 		List<FacebookPage> facebookPageList = fbExecutioner.getFacebookUserLikesTest();
 		List<Film> filmList = new ArrayList<Film>();
@@ -72,6 +72,8 @@ public class Controller {
 		RankingExec rankExecutioner = new RankingExec();
 		filmList = rankExecutioner.rankFilms(filmList, facebookPageList);
 
+		System.out.println(filmList);
 		return filmList;
+		
 	}
 }

@@ -25,7 +25,7 @@ public class RankingExec {
 		List<Film> resultList = new ArrayList<Film>();
 		
 		//per ogni film nella lista resultList calcolo la similarità con tutte le pagine
-		//associate all'utente e faccio una media che rappresenterà quanto ogni film
+		//associate all'utente calcolando poi una media che rappresenterà quanto ogni film
 		//si avvicina ai gusti dell'utente.
 		
 		Map<Film, Double> rankedFilms = new LinkedHashMap<Film, Double>();
@@ -43,10 +43,11 @@ public class RankingExec {
 		}
 		
 		rankedFilms = rankedFilms.entrySet().stream().sorted(Entry.<Film,Double>comparingByValue().reversed())
-	    .collect(Collectors.toMap(Entry::getKey, Entry::getValue,
-                (e1, e2) -> e1, LinkedHashMap::new));
+						.collect(Collectors.toMap(Entry::getKey, Entry::getValue,
+						(e1, e2) -> e1, LinkedHashMap::new));
 		
-		resultList = (List<Film>) rankedFilms.keySet();
+		System.out.println(rankedFilms);
+		resultList.addAll(rankedFilms.keySet());
 		
 		return resultList;
 		

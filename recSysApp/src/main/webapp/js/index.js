@@ -115,7 +115,9 @@ $(document).ready(function(){
 			        				},
 		        					dataType: "json",
 		        					success: function(response){
+		        						console.log(response);
 		        						alert("Success!");
+
 		        					},
 		        					error: function(result, status, error){
 		        						alert("Sorry, an error occurred. Please try again later");
