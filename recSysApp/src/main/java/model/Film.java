@@ -15,9 +15,10 @@ public class Film {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Film(String title) {
+	public Film(String title, List<String> filmingLocation) {
 		super();
 		this.title = title;
+		this.filmingLocation = filmingLocation;
 	}
 
 	public String getId() {

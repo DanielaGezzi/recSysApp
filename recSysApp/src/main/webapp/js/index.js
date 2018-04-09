@@ -112,7 +112,7 @@ $(document).ready(function(){
 		        		        
 		        				$.ajax({
 		        					type: "GET",
-		        					url: "http://localhost:8080/recSysApp/rest/services/test",
+		        					url: "http://localhost:8080/recSysApp/rest/services/film/location/test",
 		        					//contentType: "application/json; charset=utf-8",
 		        					data: {
 			        					accessToken : response.authResponse.accessToken,

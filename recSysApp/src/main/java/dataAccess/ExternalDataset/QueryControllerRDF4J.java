@@ -23,13 +23,17 @@ public class QueryControllerRDF4J implements QueryController {
 		if(endPoint == QueryControllerRDF4J.ENDPOINT_LinkedMDB) {
 			queryResult = 	"PREFIX movie: <http://data.linkedmdb.org/resource/movie/>" +
 						  	"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>" +
-						  	"SELECT ?film ?film_label ?loc_label " + 
+						  	"SELECT ?film ?film_label ?loc_label ?genre_label" + 
 							  	"WHERE {" + 
 							  	"		?film a movie:film ." + 
 							  	"		?film movie:featured_film_location ?location ." + 
 							  	"		?location movie:film_location_name ?loc_label ." + 
 							  	"		?film rdfs:label ?film_label" +
-							  	"		FILTER (str(?loc_label) = \""+ location +"\" || str(?loc_label) = \"Italy\" )" + 
+							  	"		FILTER (str(?loc_label) = \""+ location +"\" || str(?loc_label) = \"Italy\" )" +
+							  	"		OPTIONAL {" + 
+							  	"				  ?film movie:genre ?genre.\r\n" + 
+							  	"				  ?genre movie:film_genre_name ?genre_label.\r\n" + 
+							  	"		}"+
 							  	"}";
 		}
 		else if(endPoint == QueryControllerRDF4J.ENDPOINT_Wikidata) {
@@ -90,9 +94,11 @@ public class QueryControllerRDF4J implements QueryController {
 				for (;resultSet.hasNext();) {
 				      BindingSet soln = resultSet.next();
 				      String filmTitle = soln.getValue("film_label").stringValue();
+				      List<String> filmLocation = new ArrayList<String>();
+				      filmLocation.add(soln.getValue("loc_label").stringValue());
 				      byte[] bytes = filmTitle.toString().getBytes("ISO_8859_1");
 				      String title_decoded = new String(bytes, "UTF-8");
-				      Film film = new Film(Normalizer.normalize(title_decoded,  Normalizer.Form.NFD));
+				      Film film = new Film(Normalizer.normalize(title_decoded,  Normalizer.Form.NFD), filmLocation);
 				      result.add(film);
 				    }
 		    }
