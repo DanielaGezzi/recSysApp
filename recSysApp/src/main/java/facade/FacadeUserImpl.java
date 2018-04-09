@@ -16,7 +16,6 @@ public class FacadeUserImpl implements FacadeUser {
 		User user = new User(facebookUser.getId(), facebookUser.getFirstName(), facebookUser.getLastName());
 		UserRepository userRepo = new UserGraphDB();
 		userRepo.saveUser(user);
-	
 	}
 	
 	public void saveUserLikes(com.restfb.types.User facebookUser, List<FacebookPage> facebookPageList) {

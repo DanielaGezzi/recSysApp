@@ -19,7 +19,11 @@ public class FacadeFilmImpl implements FacadeFilm {
 		result = queryController.getCandidateFilms(QueryControllerRDF4J.ENDPOINT_LinkedMDB, location);
 		
 		for(Film film : result) {
-			film.setVector(fastText.getVector(film.getTitle().replace(" ", "_")));
+			try {
+				film.setVector(fastText.getVector(film.getTitle().replace(" ", "_")));
+			}catch(Exception e){
+				e.printStackTrace();
+			}
 		}
 		
 		return result;

@@ -65,7 +65,7 @@ public class UserGraphDB implements UserRepository {
 		List<FacebookPage> userLikes = new ArrayList<FacebookPage>();
 		String query = 	"PREFIX db: <http://test/resource/>" + 
 						"PREFIX user: <http://test/resource/user/>" + 
-						"PREFIX page: <http://test/resource/fbpage/>" + 
+						"PREFIX fbpage: <http://test/resource/fbpage/>" + 
 						"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>" + 
 						"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>" + 
 						"SELECT ?user ?fbPage ?fbPage_id ?fbPage_label ?fbPage_cat " +
@@ -73,9 +73,9 @@ public class UserGraphDB implements UserRepository {
 							"    ?user rdf:type db:user." + 
 							"    ?user user:userid \"" + userID +"\"." + 
 							"    ?user user:likes_fbpage ?fbPage." + 
-						    "	 ?fbPage page:fbpageid ?fbPage_id." +
+						    "	 ?fbPage fbpage:fbpageid ?fbPage_id." +
 							"    ?fbPage rdfs:label ?fbPage_label." + 
-							"    ?fbPage page:has_category ?fbPage_cat" + 
+							"    ?fbPage fbpage:has_category ?fbPage_cat" + 
 						"}";
 		
 		try {	

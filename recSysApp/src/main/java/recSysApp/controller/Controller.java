@@ -15,6 +15,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import com.google.gson.Gson;
+import com.restfb.types.User;
 
 import model.FacebookPage;
 import model.Film;
@@ -39,7 +40,7 @@ public class Controller {
     	String accessToken = map.get("accessToken");
     	
     	FacebookExec fbExecutioner = new FacebookExec(accessToken);
-		fbExecutioner.getFacebookUserInfo();
+		fbExecutioner.saveFacebookUserInfo();
 		return Response.status(200).build();
 	}
 	
@@ -59,6 +60,24 @@ public class Controller {
 	}
 	
 	@GET
+	@Path("/film/location/test")
+    @Produces(MediaType.APPLICATION_JSON)
+	public List<Film> getFilmByLocationNameTest2(@QueryParam("accessToken") String accessToken,
+												 @QueryParam("location") String location) {
+		
+		FacebookExec fbExecutioner = new FacebookExec(accessToken);
+		User facebookUser = fbExecutioner.getFacebookUserInfo();
+		GenerationExec genExecutioner = new GenerationExec();
+		List<Film> filmList = genExecutioner.getRelatedFilms(location);
+		List<FacebookPage> facebookPageList = genExecutioner.getUserFacebookLikes(facebookUser);
+		RankingExec rankExecutioner = new RankingExec();
+		filmList = rankExecutioner.rankFilms(filmList, facebookPageList);
+		//System.out.println(filmList);
+		
+		return filmList;
+	}
+	
+	@GET
 	@Path("/test")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<Film> getFilmByLocationNameTest(@QueryParam("accessToken") String accessToken,
@@ -72,7 +91,7 @@ public class Controller {
 		RankingExec rankExecutioner = new RankingExec();
 		filmList = rankExecutioner.rankFilms(filmList, facebookPageList);
 
-		System.out.println(filmList);
+		//System.out.println(filmList);
 		return filmList;
 		
 	}

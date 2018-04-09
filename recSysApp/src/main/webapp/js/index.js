@@ -29,7 +29,12 @@ function getFbUserData(userAccessToken){
     function (response) {
         document.getElementById('buttonFacebook').setAttribute("onclick","fbLogout()");
         document.getElementById('status').innerHTML = 'Thanks for logging in, ' + response.first_name + '!';
-        document.getElementById('userData').innerHTML = '<p><b>FB ID:</b> '+response.id+'</p><p><b>Name:</b> '+response.first_name+' '+response.last_name+'</p><p><b>Gender:</b> '+response.gender+'</p><p><b>Locale:</b> '+response.locale+'</p><p><b>Picture:</b> <img src="'+response.picture.data.url+'"/></p><p><b>FB Profile:</b> <a target="_blank" href="'+response.link+'">click to view profile</a></p>';
+        document.getElementById('userData').innerHTML = '<p><b>FB ID:</b> '+ response.id +
+        												'</p><p><b>Name:</b> '+ response.first_name+' '+ response.last_name +
+        												'</p><p><b>Gender:</b> '+response.gender +
+        												'</p><p><b>Locale:</b> '+ response.locale +
+        												'</p><p><b>Picture:</b> <img src="'+ response.picture.data.url +
+        												'"/></p><p><b>FB Profile:</b> <a target="_blank" href="'+ response.link+'">click to view profile</a></p>';
         
         var json = {
 			accessToken : userAccessToken

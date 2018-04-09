@@ -25,8 +25,15 @@ public class FacebookExec {
 	public FacebookExec(String accessToken){
 		this.fbClient = new DefaultFacebookClient(accessToken, Version.LATEST);
 	}
+	
+	public User getFacebookUserInfo() {
+		User user = fbClient.fetchObject("me", User.class, 
+				Parameter.with("fields", "id,first_name,last_name"));
+		return user;
+		
+	}
 
-	public void getFacebookUserInfo() {
+	public void saveFacebookUserInfo() {
     	FacadeUser facadeUser = new FacadeUserImpl();
 		//get user info try catch
 		User user = fbClient.fetchObject("me", User.class, 
@@ -35,7 +42,6 @@ public class FacebookExec {
 		facadeUser.saveUserfromFacebook(user); //save user in local DB
 		List<FacebookPage> facebookPageList = getFacebookUserLikes();
 		facadeUser.saveUserLikes(user, facebookPageList); //save user <--> fbpage in localDB
-		
 	}
 	
 	public List<FacebookPage> getFacebookUserLikesTest() {
