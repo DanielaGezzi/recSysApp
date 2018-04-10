@@ -30,10 +30,6 @@ public class QueryControllerRDF4J implements QueryController {
 							  	"		?location movie:film_location_name ?loc_label ." + 
 							  	"		?film rdfs:label ?film_label" +
 							  	"		FILTER (str(?loc_label) = \""+ location +"\" || str(?loc_label) = \"Italy\" )" +
-							  	"		OPTIONAL {" + 
-							  	"				  ?film movie:genre ?genre.\r\n" + 
-							  	"				  ?genre movie:film_genre_name ?genre_label.\r\n" + 
-							  	"		}"+
 							  	"}";
 		}
 		else if(endPoint == QueryControllerRDF4J.ENDPOINT_Wikidata) {
@@ -118,15 +114,20 @@ public class QueryControllerRDF4J implements QueryController {
 }
 /*
  * 
- * query su LMDB con filter (109)
-SELECT ?film (COUNT(?film) as ?count)
-WHERE
-{ 
-?film a movie:film . 
-?film movie:featured_film_location ?location .
-?location movie:film_location_name ?loc_label .
-FILTER (str(?loc_label) = "Rome" || str(?loc_label) = "Italy" )
-}
+ *"PREFIX movie: <http://data.linkedmdb.org/resource/movie/>" +
+						  	"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>" +
+						  	"SELECT ?film ?film_label ?loc_label ?genre_label" + 
+							  	"WHERE {" + 
+							  	"		?film a movie:film ." + 
+							  	"		?film movie:featured_film_location ?location ." + 
+							  	"		?location movie:film_location_name ?loc_label ." + 
+							  	"		?film rdfs:label ?film_label" +
+							  	"		FILTER (str(?loc_label) = \""+ location +"\" || str(?loc_label) = \"Italy\" )" +
+							  	"		OPTIONAL {" + 
+							  	"				  ?film movie:genre ?genre.\r\n" + 
+							  	"				  ?genre movie:film_genre_name ?genre_label.\r\n" + 
+							  	"		}"+
+							  	"}";
 
 
 "SELECT DISTINCT ?film ?film_label ?loc_label " + 
@@ -156,19 +157,47 @@ SELECT ?film ?filmLabel WHERE {
 http://sparql.uniprot.org/ uri endpoint comune
 
 
-SELECT DISTINCT ?film ?filmLabel ?locationLabel
+PREFIX up:<http://purl.uniprot.org/core/> 
+PREFIX keywords:<http://purl.uniprot.org/keywords/> 
+PREFIX uniprotkb:<http://purl.uniprot.org/uniprot/> 
+PREFIX taxon:<http://purl.uniprot.org/taxonomy/> 
+PREFIX ec:<http://purl.uniprot.org/enzyme/> 
+PREFIX skos:<http://www.w3.org/2004/02/skos/core#> 
+PREFIX owl:<http://www.w3.org/2002/07/owl#> 
+PREFIX bibo:<http://purl.org/ontology/bibo/> 
+PREFIX dc:<http://purl.org/dc/terms/> 
+PREFIX xsd:<http://www.w3.org/2001/XMLSchema#> 
+PREFIX faldo:<http://biohackathon.org/resource/faldo#> 
+PREFIX lmdb: <http://data.linkedmdb.org/resource/movie/>
+PREFIX wd: <http://www.wikidata.org/entity/>
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX bd: <http://www.bigdata.com/rdf#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT ?film (?filmLabel AS ?filmlab) (?locationLabel AS ?loclab)
 WHERE {
-  SERVICE <https://query.wikidata.org/sparql> {
-  SELECT ?film ?filmLabel ?locationLabel 
-  WHERE{
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en".}
-  ?film wdt:P31 wd:Q11424.
-  ?film wdt:P915 ?location.
-  ?location rdfs:label ?loc_label.
-  FILTER(STR(?loc_label) = "Rome")
-    }
-  }
-}ORDER BY ?filmLabel
+  {SERVICE <https://query.wikidata.org/sparql> {
+    SELECT ?film ?filmLabel ?locationLabel 
+      WHERE{
+        SERVICE wikibase:label { bd:serviceParam wikibase:language "en".}
+        ?film wdt:P31 wd:Q11424.
+        ?film wdt:P915 ?location.
+        ?location rdfs:label ?loc_label.
+        FILTER(STR(?loc_label) = "Rome")
+      }
+  }}UNION
+  {SERVICE <http://data.linkedmdb.org/sparql> {
+    SELECT ?film ?filmLabel ?locationLabel 
+      WHERE{
+        ?film a lmdb:film .
+        ?film lmdb:featured_film_location ?location .
+        ?location lmdb:film_location_name ?locationLabel .
+        ?film rdfs:label ?filmLabel .
+        FILTER (str(?locationLabel) = "Rome" || str(?locationLabel) = "Italy" )
+      }
+  }}
+}ORDER BY ?filmlab
 */
 
 
