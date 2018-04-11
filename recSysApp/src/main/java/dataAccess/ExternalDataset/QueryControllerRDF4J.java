@@ -153,6 +153,23 @@ SELECT ?film ?filmLabel WHERE {
   FILTER (str(?locationLabel) = "Rome")
 }
 
+i film con location cinematograica entro 1km dalle coordinate della fonta di trevi
+PREFIX geof: <http://www.opengis.net/def/geosparql/function/>
+
+SELECT ?film ?filmLabel ?locationCoord ?instanceLabel WHERE {
+  wd:Q185382 wdt:P625 ?loc.
+  ?film wdt:P915 ?place.
+  SERVICE wikibase:around {
+    ?place wdt:P625 ?locationCoord.
+    bd:serviceParam wikibase:center ?loc.
+    bd:serviceParam wikibase:radius "1".
+  }
+  #OPTIONAL { ?place wdt:P31 ?instance. }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+  BIND(geof:distance(?loc, ?locationCoord) AS ?dist)
+}
+ORDER BY ?dist
+
 
 http://sparql.uniprot.org/ uri endpoint comune
 
