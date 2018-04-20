@@ -2,7 +2,9 @@ package dataAccess.ExternalDataset;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.rdf4j.query.BindingSet;
 import org.eclipse.rdf4j.query.QueryLanguage;
@@ -111,10 +113,94 @@ public class QueryControllerRDF4J implements QueryController {
 		return result;
 	}
 
+	public List<Film> getCandidateFilmsTest(String latitude, String longitude, List<String> locationList){
+		Map<String, Film> filmMap = new LinkedHashMap<String, Film>();
+		String queryByDistance = "SELECT DISTINCT ?film ?imdbID ?filmLabel ?placeLabel ?dist WHERE" + 
+					"   	?film wdt:P915 ?place." + 
+					"   	?film wdt:P345 ?imdbID." + 
+					"   	SERVICE wikibase:around {" + 
+					"    		?place wdt:P625 ?locationCoord." + 
+					"    		bd:serviceParam wikibase:center ?loc." + 
+					"   	 	bd:serviceParam wikibase:radius \"2\"." + 
+					"   	}" + 
+					"  		VALUES (?loc) {(\"Point(12.483166666667 41.900875)\"^^geo:wktLiteral)}" + 
+					"   	SERVICE wikibase:label { bd:serviceParam wikibase:language \"en\". }" + 
+					"   	BIND(geof:distance(?loc, ?locationCoord) AS ?dist)" + 
+					"	} ORDER BY ?dist";
+		
+		String queryByLocation = "SELECT DISTINCT ?film ?imdbID ?filmLabel ?placeLabel ?dist WHERE {" + 
+					"  		SERVICE wikibase:label { bd:serviceParam wikibase:language \"en\". }" + 
+					"  		?film wdt:P915 ?place." + 
+					"  		?film wdt:P345 ?imdbID." + 
+					"  		VALUES (?loc) {(\"Point(12.483166666667 41.900875)\"^^geo:wktLiteral)}" + 
+					"  		?place rdfs:label ?locationLabel." + 
+					"  		FILTER (str(?locationLabel) = \"Rome\" || str(?locationLabel) = \"Italy\" )" + 
+					"  		?place wdt:P625 ?locationCoord." + 
+					"  		BIND(geof:distance(?loc, ?locationCoord) AS ?dist)" + 
+					"	}ORDER BY ?dist";
+		
+		SPARQLRepository repository = new SPARQLRepository(ENDPOINT_Wikidata,ENDPOINT_Wikidata);
+	    repository.initialize();
+
+		try {	
+		    RepositoryConnection connection = repository.getConnection();
+		    try{
+		    	TupleQueryResult resultSet = connection.prepareTupleQuery(QueryLanguage.SPARQL,queryByDistance).evaluate();
+			
+				for (;resultSet.hasNext();) {
+				      BindingSet soln = resultSet.next();
+				      String imdbID = soln.getValue("imdbID").stringValue(); //imdbID
+				      if (!filmMap.containsKey(imdbID)) {
+					      String filmTitle = soln.getValue("filmLabel").stringValue(); //Title
+					      filmTitle = new String(filmTitle.toString().getBytes("ISO_8859_1"), "UTF-8");
+					      List<String> filmLocation = new ArrayList<String>();
+					      filmLocation.add(soln.getValue("placeLabel").stringValue()); //Location
+					      double distance = Double.parseDouble(soln.getValue("imdbID").stringValue()); //Distance
+					      Film film = new Film(imdbID, Normalizer.normalize(filmTitle,  Normalizer.Form.NFD), filmLocation, distance);
+					      filmMap.put(imdbID, film);
+				      } else {
+				    	  List<String> filmLocation = filmMap.get(imdbID).getFilmingLocation();
+				    	  if(!filmLocation.contains(soln.getValue("placeLabel").stringValue()))
+				    		  filmLocation.add(soln.getValue("placeLabel").stringValue());
+				    	  filmMap.get(imdbID).setFilmingLocation(filmLocation);
+				      }
+				    }
+				
+				resultSet = connection.prepareTupleQuery(QueryLanguage.SPARQL,queryByLocation).evaluate();
+
+				for (;resultSet.hasNext();) {
+				      BindingSet soln = resultSet.next();
+				      String imdbID = soln.getValue("imdbID").stringValue(); //imdbID
+				      if (!filmMap.containsKey(imdbID)) {
+					      String filmTitle = soln.getValue("filmLabel").stringValue(); //Title
+					      filmTitle = new String(filmTitle.toString().getBytes("ISO_8859_1"), "UTF-8");
+					      List<String> filmLocation = new ArrayList<String>();
+					      filmLocation.add(soln.getValue("placeLabel").stringValue()); //Location
+					      double distance = Double.parseDouble(soln.getValue("imdbID").stringValue()); //Distance
+					      Film film = new Film(imdbID, Normalizer.normalize(filmTitle,  Normalizer.Form.NFD), filmLocation, distance);
+					      filmMap.put(imdbID, film);
+				      } else {
+				    	  List<String> filmLocation = filmMap.get(imdbID).getFilmingLocation();
+				    	  if(!filmLocation.contains(soln.getValue("placeLabel").stringValue()))
+				    		  filmLocation.add(soln.getValue("placeLabel").stringValue());				    	  
+				    	  filmMap.get(imdbID).setFilmingLocation(filmLocation);
+				      }
+				    }
+		    }
+			finally{
+				connection.close();
+			}
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return (List<Film>) filmMap.values();
+	}
 }
 /*
  * 
- *"PREFIX movie: <http://data.linkedmdb.org/resource/movie/>" +
+ ***linkedmdb*************
+ "PREFIX movie: <http://data.linkedmdb.org/resource/movie/>" +
 						  	"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>" +
 						  	"SELECT ?film ?film_label ?loc_label ?genre_label" + 
 							  	"WHERE {" + 
@@ -141,9 +227,9 @@ public class QueryControllerRDF4J implements QueryController {
 
 *
 *
-* query su wikidata (155)
+*** query su wikidata (155)************************
 * 
-* PREFIX wikibase: <http://wikiba.se/ontology#>
+PREFIX wikibase: <http://wikiba.se/ontology#>
 SELECT ?film ?filmLabel WHERE {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
   ?film wdt:P31 wd:Q11424.
@@ -153,8 +239,8 @@ SELECT ?film ?filmLabel WHERE {
   FILTER (str(?locationLabel) = "Rome")
 }
 
-i film con location cinematograica entro 1km dalle coordinate della fonta di trevi
-PREFIX geof: <http://www.opengis.net/def/geosparql/function/>
+***i film con location cinematograica entro 1km dalle coordinate della fonta di trevi
+***PREFIX geof: <http://www.opengis.net/def/geosparql/function/>
 
 SELECT ?film ?filmLabel ?locationCoord ?instanceLabel WHERE {
   wd:Q185382 wdt:P625 ?loc.
@@ -170,7 +256,24 @@ SELECT ?film ?filmLabel ?locationCoord ?instanceLabel WHERE {
 }
 ORDER BY ?dist
 
+***con coordinate
 
+SELECT DISTINCT ?film ?imdbID ?filmLabel ?placeLabel ?dist WHERE {
+  #wd:Q185382 wdt:P625 ?loc.
+  ?film wdt:P915 ?place.
+  ?film wdt:P345 ?imdbID.
+  SERVICE wikibase:around {
+    ?place wdt:P625 ?locationCoord.
+    bd:serviceParam wikibase:center ?loc.
+    bd:serviceParam wikibase:radius "3".
+  }
+  VALUES (?loc) {("Point(12.483166666667 41.900875)"^^geo:wktLiteral)}    
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+  BIND(geof:distance(?loc, ?locationCoord) AS ?dist)
+}
+ORDER BY ?dist
+
+**federate queries
 http://sparql.uniprot.org/ uri endpoint comune
 
 

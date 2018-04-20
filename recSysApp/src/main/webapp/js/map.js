@@ -1,6 +1,13 @@
 $(document).ready(function(){
 
 
+var view = new ol.View({
+    center: [12.5113300, 41.8919300],
+    zoom: 12,
+	  projection: 'EPSG:4326'
+
+  });
+
 var mousePositionControl = new ol.control.MousePosition({
         coordinateFormat: ol.coordinate.createStringXY(4),
         projection: 'EPSG:4326',
@@ -23,12 +30,7 @@ var mousePositionControl = new ol.control.MousePosition({
           })
         ],
         target: 'map',
-        view: new ol.View({
-          center: [12.5113300, 41.8919300],
-          zoom: 12,
-      	  projection: 'EPSG:4326'
-
-        })
+        view: view
       });
 
       map.on('click', function(event){
@@ -46,6 +48,7 @@ var mousePositionControl = new ol.control.MousePosition({
 				dataType: "json",
 				success: function(response){
 					console.log(response);
+					console.log(coor);
 					alert("Success!");
 
 				},
@@ -56,4 +59,84 @@ var mousePositionControl = new ol.control.MousePosition({
 			})
     });
       
+var container = document.getElementById('popup');
+var content = document.getElementById('popup-content');
+var closer = document.getElementById('popup-closer');   
+
+// popup
+var popup = new ol.Overlay({
+    element: container,
+    autoPan: true,
+    autoPanAnimation: {
+      duration: 250
+    }
+  });
+
+/**
+ * Add a click handler to hide the popup.
+ * @return {boolean} Don't follow the href.
+ */
+closer.onclick = function() {
+  popup.setPosition(undefined);
+  closer.blur();
+  return false;
+};
+map.addOverlay(popup);
+
+  //Instantiate with some options and add the Control
+var geocoder = new Geocoder('nominatim', {
+    provider: 'osm',
+    lang: 'en',
+    placeholder: 'Search for ...',
+    limit: 5,
+    debug: false,
+    autoComplete: true,
+    keepOpen: true
+  });
+map.addControl(geocoder);
+    
+  //Listen when an address is chosen
+geocoder.on('addresschosen', function (evt) {
+  	console.info(evt);
+  	var coordinate = evt.coordinate;
+    var hdms = ol.coordinate.toStringHDMS(ol.proj.transform(
+        coordinate, 'EPSG:3857', 'EPSG:4326'));
+    flyTo(coordinate, function(){});
+    window.setTimeout(function () {
+    content.innerHTML = '<p>You are here:</p><code>' +
+    					coordinate + '<br>' +
+    					evt.address.formatted +
+    					'</code>';
+    popup.setPosition(coordinate);
+    }, 2000);
+  });
+  
+function flyTo(location, done) {
+    var duration = 2000;
+    var zoom = view.getZoom();
+    var parts = 2;
+    var called = false;
+    function callback(complete) {
+      --parts;
+      if (called) {
+        return;
+      }
+      if (parts === 0 || !complete) {
+        called = true;
+        done(complete);
+      }
+    }
+    view.animate({
+      center: location,
+      duration: duration
+    }, callback);
+    view.animate({
+      zoom: zoom - 1,
+      duration: duration / 2
+    }, {
+      zoom: zoom,
+      duration: duration / 2
+    }, callback);
+  }
 });
+

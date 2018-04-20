@@ -4,10 +4,11 @@ import java.util.List;
 
 public class Film {
 	
-	private String id;
+	private String imdbId;
 	private String title;
 	private String genre;
 	private List<String> filmingLocation;
+	private double distance;
 	private List<Float> vector;
 	
 	public Film() {
@@ -21,12 +22,20 @@ public class Film {
 		this.filmingLocation = filmingLocation;
 	}
 
-	public String getId() {
-		return id;
+	public Film(String imdbId, String title, List<String> filmingLocation, double distance) {
+		super();
+		this.imdbId = imdbId;
+		this.title = title;
+		this.filmingLocation = filmingLocation;
+		this.distance = distance;
 	}
 
-	public void setId(String id) {
-		this.id = id;
+	public String getImdbId() {
+		return imdbId;
+	}
+
+	public void setImdbId(String imdbId) {
+		this.imdbId = imdbId;
 	}
 
 	public String getTitle() {
@@ -60,11 +69,19 @@ public class Film {
 	public void setVector(List<Float> vector) {
 		this.vector = vector;
 	}
+
+	public double getDistance() {
+		return distance;
+	}
+
+	public void setDistance(double distance) {
+		this.distance = distance;
+	}
 	
 	@Override
 	public String toString() {
-		return "Film [id=" + id + ", title=" + title + ", genre=" + genre + ", filmingLocation=" + filmingLocation
-				+ "]";
+		return "Film [imdbId=" + imdbId + ", title=" + title + ", genre=" + genre + ", filmingLocation="
+				+ filmingLocation + ", distance=" + distance + ", vector=" + vector + "]";
 	}
 	
 }
