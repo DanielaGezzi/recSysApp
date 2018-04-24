@@ -1,9 +1,11 @@
 package dataAccess.ExternalDataset;
 
+import java.io.UnsupportedEncodingException;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import org.eclipse.rdf4j.query.BindingSet;
@@ -18,6 +20,26 @@ public class QueryControllerRDF4J implements QueryController {
 
 	public final static String ENDPOINT_LinkedMDB = "http://data.linkedmdb.org/sparql";
 	public final static String ENDPOINT_Wikidata = "https://query.wikidata.org/sparql";
+	
+	private TupleQueryResult evaluateQuery(String endpoint, String query) {
+		TupleQueryResult resultSet = null;
+		SPARQLRepository repository = new SPARQLRepository(endpoint,endpoint);
+	    repository.initialize();
+	    
+		try {	
+		    RepositoryConnection connection = repository.getConnection();
+		    try{
+		    	resultSet = connection.prepareTupleQuery(QueryLanguage.SPARQL,query).evaluate();
+		    }finally{
+					connection.close();
+				}
+			} 
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+		
+		return resultSet;
+	}
 	
 	@Override
 	public String generateQuery(String endPoint, String location) {
@@ -52,29 +74,76 @@ public class QueryControllerRDF4J implements QueryController {
 		return queryResult;	
 	}
 	
-	public String generateQuery(String location) {
-		return  "PREFIX lmdb: <http://data.linkedmdb.org/resource/movie/>" + 
-				"PREFIX wd: <http://www.wikidata.org/entity/> \r\n" + 
-				"PREFIX wdt: <http://www.wikidata.org/prop/direct/>" + 
-				"PREFIX wikibase: <http://wikiba.se/ontology#>" +
-				"PREFIX bd: <http://www.bigdata.com/rdf#>" +
-			  	"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>" +
-			  	"SELECT DISTINCT ?film ?film_label ?loc_label " + 
-				  	"WHERE {" + 
-				  		"SERVICE <"+ QueryControllerRDF4J.ENDPOINT_LinkedMDB +"> {" +
-				  	"		?film a lmdb:film ." + 
-				  	"		?film lmdb:featured_film_location ?location ." + 
-				  	"		?location lmdb:film_location_name ?loc_label ." + 
-				  	"		FILTER (str(?loc_label) = \""+ location +"\" || str(?loc_label) = \"Italy\" )" +
-				  	"	}" + 
-				  		"SERVICE <"+ QueryControllerRDF4J.ENDPOINT_Wikidata +"> {" +
-						"		SERVICE wikibase:label { bd:serviceParam wikibase:language \"en\". }" +
-						"		?film wdt:P31 wd:Q11424." +
-						"		?film wdt:P915 ?location." +
-						"		?location rdfs:label ?locationLabel." +
-						"		FILTER (str(?locationLabel) = \""+ location +"\")" +				  	
-					"	}" + 
-				  	"}";
+	public List<String> generateQuery(String endPoint, String latitude, String longitude, List<String> locationList) {
+		List<String> queryList = new ArrayList<String>();
+		
+		/*WikiData endPoint queries*/
+		if(endPoint == QueryControllerRDF4J.ENDPOINT_Wikidata) {
+			
+			//distance from coordinates in a radius of 2km
+			String queryByDistance = "SELECT DISTINCT ?film ?imdbID ?filmLabel ?placeLabel ?dist" + 
+									 "  WHERE {" + 
+									 "   	?film wdt:P915 ?place." + 
+									 "   	?film wdt:P345 ?imdbID." + 
+									 "   	SERVICE wikibase:around {" + 
+									 "    		?place wdt:P625 ?locationCoord." + 
+									 "    		bd:serviceParam wikibase:center ?loc." + 
+									 "   	 	bd:serviceParam wikibase:radius \"2\"." + 
+									 "   	}" + 
+									 "  		VALUES (?loc) {(\"Point("+ longitude +" "+ latitude +")\"^^geo:wktLiteral)}" + 
+									 "   	SERVICE wikibase:label { bd:serviceParam wikibase:language \"en\". }" + 
+									 "   	BIND(geof:distance(?loc, ?locationCoord) AS ?dist)" + 
+									 "} ORDER BY ?dist";
+			
+			queryList.add(queryByDistance);
+			
+			//filter by locations name usually [City, Region, Nation]
+			if(!locationList.isEmpty()) {
+				String filterContent = "str(?locationLabel) = \""+ locationList.get(0) +"\" ";
+				for(ListIterator<String> lit = locationList.listIterator(1); lit.hasNext();) {
+					filterContent.concat("|| str(?locationLabel) = \""+ lit.next() +"\" ");	
+				}
+				String queryByLocation = "SELECT DISTINCT ?film ?imdbID ?filmLabel ?placeLabel ?dist WHERE {" + 
+						"  		SERVICE wikibase:label { bd:serviceParam wikibase:language \"en\". }" + 
+						"  		?film wdt:P915 ?place." + 
+						"  		?film wdt:P345 ?imdbID." + 
+						"  		VALUES (?loc) {(\"Point("+ longitude +" "+ latitude +")\"^^geo:wktLiteral)}" + 
+						"  		?place rdfs:label ?locationLabel." + 
+						"  		FILTER (" + filterContent + ")" + 
+						"  		?place wdt:P625 ?locationCoord." + 
+						"  		BIND(geof:distance(?loc, ?locationCoord) AS ?dist)" + 
+						"	}ORDER BY ?dist";
+				
+				queryList.add(queryByLocation);
+			}
+			
+		}//end of wikidata endPoint queries
+		
+		/*LinkedMDB endPoint queries*/
+		if(endPoint == QueryControllerRDF4J.ENDPOINT_LinkedMDB) {
+			if(!locationList.isEmpty()) {
+				String filterStr = "str(?loc_label) = \""+ locationList.get(0) +"\" ";
+				for(ListIterator<String> lit = locationList.listIterator(1); lit.hasNext();) {
+					filterStr.concat("|| str(?loc_label) = \""+ lit.next() +"\" ");	
+				}
+				String queryLmdb = 	"PREFIX movie: <http://data.linkedmdb.org/resource/movie/>" +
+							  		"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>" +
+							  		"SELECT ?film ?film_label ?loc_label" + 
+								  	"WHERE {" + 
+								  	"		?film a movie:film ." + 
+								  	"		?film movie:featured_film_location ?location ." + 
+								  	"		?location movie:film_location_name ?loc_label ." + 
+								  	"		?film rdfs:label ?film_label" +
+								  	"		FILTER ("+ filterStr +")" +
+								  	"}";
+			
+				queryList.add(queryLmdb);
+			
+			}
+		}
+		
+		return queryList;
+
 	}
 
 	@Override
@@ -115,88 +184,56 @@ public class QueryControllerRDF4J implements QueryController {
 
 	public List<Film> getCandidateFilmsTest(String latitude, String longitude, List<String> locationList){
 		Map<String, Film> filmMap = new LinkedHashMap<String, Film>();
-		String queryByDistance = "SELECT DISTINCT ?film ?imdbID ?filmLabel ?placeLabel ?dist WHERE" + 
-					"   	?film wdt:P915 ?place." + 
-					"   	?film wdt:P345 ?imdbID." + 
-					"   	SERVICE wikibase:around {" + 
-					"    		?place wdt:P625 ?locationCoord." + 
-					"    		bd:serviceParam wikibase:center ?loc." + 
-					"   	 	bd:serviceParam wikibase:radius \"2\"." + 
-					"   	}" + 
-					"  		VALUES (?loc) {(\"Point(12.483166666667 41.900875)\"^^geo:wktLiteral)}" + 
-					"   	SERVICE wikibase:label { bd:serviceParam wikibase:language \"en\". }" + 
-					"   	BIND(geof:distance(?loc, ?locationCoord) AS ?dist)" + 
-					"	} ORDER BY ?dist";
-		
-		String queryByLocation = "SELECT DISTINCT ?film ?imdbID ?filmLabel ?placeLabel ?dist WHERE {" + 
-					"  		SERVICE wikibase:label { bd:serviceParam wikibase:language \"en\". }" + 
-					"  		?film wdt:P915 ?place." + 
-					"  		?film wdt:P345 ?imdbID." + 
-					"  		VALUES (?loc) {(\"Point(12.483166666667 41.900875)\"^^geo:wktLiteral)}" + 
-					"  		?place rdfs:label ?locationLabel." + 
-					"  		FILTER (str(?locationLabel) = \"Rome\" || str(?locationLabel) = \"Italy\" )" + 
-					"  		?place wdt:P625 ?locationCoord." + 
-					"  		BIND(geof:distance(?loc, ?locationCoord) AS ?dist)" + 
-					"	}ORDER BY ?dist";
-		
-		SPARQLRepository repository = new SPARQLRepository(ENDPOINT_Wikidata,ENDPOINT_Wikidata);
-	    repository.initialize();
+		List<String> queryListWikiData = generateQuery(QueryControllerRDF4J.ENDPOINT_Wikidata, latitude, longitude, locationList);
+		List<String> queryListLMDB = generateQuery(QueryControllerRDF4J.ENDPOINT_LinkedMDB, latitude, longitude, locationList);
 
-		try {	
-		    RepositoryConnection connection = repository.getConnection();
-		    try{
-		    	TupleQueryResult resultSet = connection.prepareTupleQuery(QueryLanguage.SPARQL,queryByDistance).evaluate();
-			
-				for (;resultSet.hasNext();) {
-				      BindingSet soln = resultSet.next();
-				      String imdbID = soln.getValue("imdbID").stringValue(); //imdbID
-				      if (!filmMap.containsKey(imdbID)) {
-					      String filmTitle = soln.getValue("filmLabel").stringValue(); //Title
-					      filmTitle = new String(filmTitle.toString().getBytes("ISO_8859_1"), "UTF-8");
-					      List<String> filmLocation = new ArrayList<String>();
-					      filmLocation.add(soln.getValue("placeLabel").stringValue()); //Location
-					      double distance = Double.parseDouble(soln.getValue("imdbID").stringValue()); //Distance
-					      Film film = new Film(imdbID, Normalizer.normalize(filmTitle,  Normalizer.Form.NFD), filmLocation, distance);
-					      filmMap.put(imdbID, film);
-				      } else {
-				    	  List<String> filmLocation = filmMap.get(imdbID).getFilmingLocation();
-				    	  if(!filmLocation.contains(soln.getValue("placeLabel").stringValue()))
-				    		  filmLocation.add(soln.getValue("placeLabel").stringValue());
-				    	  filmMap.get(imdbID).setFilmingLocation(filmLocation);
-				      }
-				    }
-				
-				resultSet = connection.prepareTupleQuery(QueryLanguage.SPARQL,queryByLocation).evaluate();
-
-				for (;resultSet.hasNext();) {
-				      BindingSet soln = resultSet.next();
-				      String imdbID = soln.getValue("imdbID").stringValue(); //imdbID
-				      if (!filmMap.containsKey(imdbID)) {
-					      String filmTitle = soln.getValue("filmLabel").stringValue(); //Title
-					      filmTitle = new String(filmTitle.toString().getBytes("ISO_8859_1"), "UTF-8");
-					      List<String> filmLocation = new ArrayList<String>();
-					      filmLocation.add(soln.getValue("placeLabel").stringValue()); //Location
-					      double distance = Double.parseDouble(soln.getValue("imdbID").stringValue()); //Distance
-					      Film film = new Film(imdbID, Normalizer.normalize(filmTitle,  Normalizer.Form.NFD), filmLocation, distance);
-					      filmMap.put(imdbID, film);
-				      } else {
-				    	  List<String> filmLocation = filmMap.get(imdbID).getFilmingLocation();
-				    	  if(!filmLocation.contains(soln.getValue("placeLabel").stringValue()))
-				    		  filmLocation.add(soln.getValue("placeLabel").stringValue());				    	  
-				    	  filmMap.get(imdbID).setFilmingLocation(filmLocation);
-				      }
-				    }
-		    }
-			finally{
-				connection.close();
+		for(String query : queryListWikiData) {
+			TupleQueryResult resultSet = evaluateQuery(QueryControllerRDF4J.ENDPOINT_Wikidata, queryListWikiData.get(0));
+			if (resultSet!= null) {
+				filmMap = mergeResults(filmMap, resultSet);
 			}
-		} 
-		catch (Exception e) {
-			e.printStackTrace();
 		}
+		   
 		return (List<Film>) filmMap.values();
 	}
+	
+	private Map<String, Film> mergeResults(Map<String,Film> filmMap, TupleQueryResult resultSet){
+		
+		for (;resultSet.hasNext();) {
+		      BindingSet soln = resultSet.next();
+		      String imdbID = soln.getValue("imdbID").stringValue(); //imdbID
+		      if (!filmMap.containsKey(imdbID)) {
+			      String filmTitle = soln.getValue("filmLabel").stringValue(); //Title
+			      try {
+					filmTitle = new String(filmTitle.toString().getBytes("ISO_8859_1"), "UTF-8");
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			      List<String> filmLocation = new ArrayList<String>();
+			      filmLocation.add(soln.getValue("placeLabel").stringValue()); //Location
+			      double distance = Double.parseDouble(soln.getValue("imdbID").stringValue()); //Distance
+			      Film film = new Film(imdbID, Normalizer.normalize(filmTitle,  Normalizer.Form.NFD), filmLocation, distance);
+			      filmMap.put(imdbID, film);
+		      } else {
+		    	  List<String> filmLocation = filmMap.get(imdbID).getFilmingLocation();
+		    	  if(!filmLocation.contains(soln.getValue("placeLabel").stringValue()))
+		    		  filmLocation.add(soln.getValue("placeLabel").stringValue());
+		    	  filmMap.get(imdbID).setFilmingLocation(filmLocation);
+		      }
+		    }
+		
+		return filmMap;
+		
+	}
 }
+
+
+
+
+
+
+
 /*
  * 
  ***linkedmdb*************
