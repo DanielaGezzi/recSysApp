@@ -16,7 +16,10 @@ public class FacadeFilmImpl implements FacadeFilm {
 		List<Film> result = new ArrayList<Film>();
 		FastText fastText = FastText.getFastText();
 		QueryController queryController = new QueryControllerRDF4J();
-		result = queryController.getCandidateFilms(QueryControllerRDF4J.ENDPOINT_LinkedMDB, location);
+		List<String> location2 = new ArrayList<String>();
+		location2.add("Rome");
+		location2.add("Italy");
+		result = queryController.getCandidateFilmsTest("41.90083", "12.48311", location2);
 		
 		for(Film film : result) {
 			try {

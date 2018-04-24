@@ -8,5 +8,6 @@ public interface QueryController {
 	
 	String generateQuery(String endPoint, String location);
 	List<Film> getCandidateFilms(String endPoint, String location);
+	List<Film> getCandidateFilmsTest(String lat, String lon, List<String> location);
 
 }

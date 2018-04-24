@@ -193,8 +193,8 @@ public class QueryControllerRDF4J implements QueryController {
 				filmMap = mergeResults(filmMap, resultSet);
 			}
 		}
-		   
-		return (List<Film>) filmMap.values();
+		List<Film> resultList = new ArrayList<Film>(filmMap.values());  
+		return resultList;
 	}
 	
 	private Map<String, Film> mergeResults(Map<String,Film> filmMap, TupleQueryResult resultSet){
@@ -212,7 +212,7 @@ public class QueryControllerRDF4J implements QueryController {
 				}
 			      List<String> filmLocation = new ArrayList<String>();
 			      filmLocation.add(soln.getValue("placeLabel").stringValue()); //Location
-			      double distance = Double.parseDouble(soln.getValue("imdbID").stringValue()); //Distance
+			      double distance = Double.parseDouble(soln.getValue("dist").stringValue()); //Distance
 			      Film film = new Film(imdbID, Normalizer.normalize(filmTitle,  Normalizer.Form.NFD), filmLocation, distance);
 			      filmMap.put(imdbID, film);
 		      } else {
