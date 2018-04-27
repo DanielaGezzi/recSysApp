@@ -117,6 +117,19 @@
 		    <version>8.4.1</version>
 		</dependency> 
 		
+		<!-- https://mvnrepository.com/artifact/org.lenskit/lenskit-core -->
+			<dependency>
+			    <groupId>org.lenskit</groupId>
+			    <artifactId>lenskit-core</artifactId>
+			    <version>3.0-M3</version>
+			</dependency>
+	  <!-- https://mvnrepository.com/artifact/org.lenskit/lenskit-knn -->
+			<dependency>
+			    <groupId>org.lenskit</groupId>
+			    <artifactId>lenskit-knn</artifactId>
+			    <version>3.0-M3</version>
+			</dependency>
+		
 
     </dependencies>
     <properties>
