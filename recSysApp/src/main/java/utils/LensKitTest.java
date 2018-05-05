@@ -1,19 +1,23 @@
 package utils;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.LinkedHashSet;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import org.lenskit.LenskitConfiguration;
 import org.lenskit.LenskitRecommender;
 import org.lenskit.LenskitRecommenderEngine;
 import org.lenskit.api.ItemRecommender;
 import org.lenskit.api.ItemScorer;
-import org.lenskit.api.RatingPredictor;
-import org.lenskit.api.Recommender;
 import org.lenskit.api.RecommenderBuildException;
 import org.lenskit.api.Result;
 import org.lenskit.api.ResultList;
@@ -27,17 +31,19 @@ import org.lenskit.data.entities.CommonAttributes;
 import org.lenskit.data.entities.CommonTypes;
 import org.lenskit.data.entities.Entity;
 import org.lenskit.data.entities.EntityType;
+import org.lenskit.data.entities.TypedName;
 import org.lenskit.knn.item.ItemItemScorer;
 import org.lenskit.transform.normalize.BaselineSubtractingUserVectorNormalizer;
 import org.lenskit.transform.normalize.UserVectorNormalizer;
 
 import com.google.common.base.Throwables;
 
+import model.Film;
+
 public class LensKitTest {
 
-	public static void test() {
+	public void testRec() {
 		Path dataFile = Paths.get("src/main/resources/movielens.yml");
-		String delimiter = ",";
 		
 		LenskitConfiguration config = new LenskitConfiguration();
 		// Use item-item CF to score items
@@ -88,10 +94,53 @@ public class LensKitTest {
 		}
 		
         
-	}						
+	}		
 	
+	public void TestCount(List<Film> films) throws IOException {
+		File file = new File(getClass().getClassLoader().getResource("movielens.yml").getFile());
+		Path dataFile = Paths.get(file.getPath());
+		DataAccessObject dao;
+        try {
+            StaticDataSource data = StaticDataSource.load(dataFile);
+            // get the data from the DAO
+            dao = data.get();
+        } catch (IOException e) {
+            System.out.println("cannot load data" + e);
+            throw Throwables.propagate(e);
+        }
+        Map<Film,Long> testMap = new LinkedHashMap<Film,Long>();
+        for(Film film: films) {
+	        List<Entity> movieData = dao.query(EntityType.forName("item-ids")).withAttribute(TypedName.create("imdbid", String.class), film.getImdbId().substring(2)).get();
+	        if(!movieData.isEmpty()) {
+	        	long id = (long) movieData.get(0).maybeGet("id");
+	        	long count = dao.query(CommonTypes.RATING).withAttribute(CommonAttributes.ITEM_ID, id).count();
+	        	System.out.format("\t%d [%s] [%s] (count): %d",id,film.getImdbId(),film.getTitle(),count);
+	        	testMap.put(film, count);
+	        }
+	        else {
+	        	System.out.format("\t%s %s is empty",film.getImdbId(), film.getTitle());
+	        	testMap.put(film, (long) 0);
+	        }
+        }
+        
+        
+        testMap = testMap.entrySet().stream().sorted(Entry.<Film,Long>comparingByValue().reversed())
+				.collect(Collectors.toMap(Entry::getKey, Entry::getValue,
+				(e1, e2) -> e1, LinkedHashMap::new));
+        
+            
+        FileWriter fileWriter = new FileWriter("test.txt");
+        PrintWriter printWriter = new PrintWriter(fileWriter); 
+        
+        for( Film film :testMap.keySet()) {
+        	System.out.format("\t[%s] %s COUNT: %d ", film.getImdbId(), film.getTitle(), testMap.get(film));
+            printWriter.printf("\t[%s] %s COUNT: %d \r", film.getImdbId(), film.getTitle(), testMap.get(film));
+
+        }
+        printWriter.close();
 		
-	public static void main(String[] args){
-		test();
 	}
+
+	
+	
 }

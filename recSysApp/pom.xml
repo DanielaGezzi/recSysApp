@@ -123,12 +123,27 @@
 			    <artifactId>lenskit-core</artifactId>
 			    <version>3.0-M3</version>
 			</dependency>
-	  <!-- https://mvnrepository.com/artifact/org.lenskit/lenskit-knn -->
+		<!-- https://mvnrepository.com/artifact/org.lenskit/lenskit-knn -->
 			<dependency>
 			    <groupId>org.lenskit</groupId>
 			    <artifactId>lenskit-knn</artifactId>
 			    <version>3.0-M3</version>
 			</dependency>
+			
+		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+			<dependency>
+			    <groupId>com.google.guava</groupId>
+			    <artifactId>guava</artifactId>
+			    <version>22.0</version>
+			</dependency>
+		<!-- https://mvnrepository.com/artifact/org.ow2.asm/asm -->
+			<dependency>
+			    <groupId>org.ow2.asm</groupId>
+			    <artifactId>asm</artifactId>
+			    <version>5.2</version>
+			</dependency>
+
+			
 		
 
     </dependencies>

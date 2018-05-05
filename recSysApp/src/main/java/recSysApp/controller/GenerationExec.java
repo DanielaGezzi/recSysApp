@@ -1,5 +1,6 @@
 package recSysApp.controller;
 
+import java.io.IOException;
 import java.util.List;
 import com.restfb.types.User;
 import facade.FacadeFilm;
@@ -8,6 +9,7 @@ import facade.FacadeUser;
 import facade.FacadeUserImpl;
 import model.FacebookPage;
 import model.Film;
+import utils.LensKitTest;
 
 public class GenerationExec {
 	
@@ -24,7 +26,16 @@ public class GenerationExec {
 	public List<Film> getRelatedFilms(String location) {
 		
 		FacadeFilm facadeFilm = new FacadeFilmImpl();
-		return facadeFilm.getCandidateFilms(location);
+		//LensKitTest lstest = new LensKitTest();
+		List<Film> testList = facadeFilm.getCandidateFilms(location);
+		/*try {
+			lstest.TestCount(testList);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		*/
+		return testList;
 
 	}
 	
