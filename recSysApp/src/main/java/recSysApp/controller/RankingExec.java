@@ -38,6 +38,7 @@ public class RankingExec {
 				averageNum +=  cosineSimilarity(floatFilmArray, floatFilmfbPage);
 				i++;
 			}
+			film.setSimilarity(averageNum/i);
 			rankedFilms.put(film,averageNum/i);
 		}
 		
@@ -45,7 +46,6 @@ public class RankingExec {
 						.collect(Collectors.toMap(Entry::getKey, Entry::getValue,
 						(e1, e2) -> e1, LinkedHashMap::new));
 		
-		System.out.println(rankedFilms);
 		resultList.addAll(rankedFilms.keySet());
 		
 		return resultList;

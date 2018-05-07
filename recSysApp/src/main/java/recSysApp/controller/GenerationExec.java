@@ -9,6 +9,7 @@ import facade.FacadeUser;
 import facade.FacadeUserImpl;
 import model.FacebookPage;
 import model.Film;
+import model.Location;
 import utils.LensKitTest;
 
 public class GenerationExec {
@@ -23,7 +24,7 @@ public class GenerationExec {
 	 * @param     	
 	 * @return list of candidate resources from LOD (film with vector from fastText)
 	 */
-	public List<Film> getRelatedFilms(String location) {
+	public List<Film> getRelatedFilms(Location location) {
 		
 		FacadeFilm facadeFilm = new FacadeFilmImpl();
 		//LensKitTest lstest = new LensKitTest();

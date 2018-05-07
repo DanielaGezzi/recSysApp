@@ -8,9 +8,10 @@ public class Film {
 	private String title;
 	private String genre;
 	private List<String> filmingLocation;
-	private double distance;
 	private List<Float> vector;
+	private double similarity;
 	
+
 	public Film() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -22,12 +23,10 @@ public class Film {
 		this.filmingLocation = filmingLocation;
 	}
 
-	public Film(String imdbId, String title, List<String> filmingLocation, double distance) {
+	public Film(String imdbId, String title) {
 		super();
 		this.imdbId = imdbId;
 		this.title = title;
-		this.filmingLocation = filmingLocation;
-		this.distance = distance;
 	}
 
 	public String getImdbId() {
@@ -69,19 +68,21 @@ public class Film {
 	public void setVector(List<Float> vector) {
 		this.vector = vector;
 	}
-
-	public double getDistance() {
-		return distance;
+	
+	public double getSimilarity() {
+		return similarity;
 	}
 
-	public void setDistance(double distance) {
-		this.distance = distance;
+	public void setSimilarity(double similarity) {
+		this.similarity = similarity;
 	}
 	
 	@Override
 	public String toString() {
 		return "Film [imdbId=" + imdbId + ", title=" + title + ", genre=" + genre + ", filmingLocation="
-				+ filmingLocation + ", distance=" + distance + ", vector=" + vector + "]";
+				+ filmingLocation + ", vector=" + vector + ", similarity=" + similarity
+				+ "]";
 	}
+	
 	
 }

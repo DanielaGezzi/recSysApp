@@ -1,6 +1,5 @@
 package recSysApp.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -10,7 +9,6 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -19,6 +17,7 @@ import com.restfb.types.User;
 
 import model.FacebookPage;
 import model.Film;
+import model.Location;
 
 
 @Path("/services")
@@ -46,25 +45,18 @@ public class Controller {
 	
 	
 	@GET
-	@Path("/film/location/{location}")
-    @Produces(MediaType.APPLICATION_JSON)
-	public List<Film> getFilmByLocationName(@PathParam("location") String locationName) {
-		
-		List<Film> filmList = new ArrayList<Film>();
-		GenerationExec genExecutioner = new GenerationExec();
-		filmList = genExecutioner.getRelatedFilms(locationName);
-		//RankingExec rankExecutioner = new RankingExec();
-		//filmList = rankExecutioner.rankFilms(filmList, this.user);
-		
-		return filmList;
-	}
-	
-	@GET
 	@Path("/film/location/test")
     @Produces(MediaType.APPLICATION_JSON)
-	public List<Film> getFilmByLocationNameTest2(@QueryParam("accessToken") String accessToken,
-												 @QueryParam("location") String location) {
-		
+	public List<Film> getFilmByLocation(@QueryParam("accessToken") String accessToken,
+										@QueryParam("latitude") String latitude,
+										@QueryParam("longitude") String longitude,
+										@QueryParam("place") String name,
+										@QueryParam("city") String city,
+										@QueryParam("state") String state,
+										@QueryParam("country") String country) {
+
+		Location location = new Location(name, city, state, country, latitude, longitude);
+		System.out.println(location);
 		FacebookExec fbExecutioner = new FacebookExec(accessToken);
 		User facebookUser = fbExecutioner.getFacebookUserInfo();
 		GenerationExec genExecutioner = new GenerationExec();
@@ -72,27 +64,8 @@ public class Controller {
 		List<FacebookPage> facebookPageList = genExecutioner.getUserFacebookLikes(facebookUser);
 		RankingExec rankExecutioner = new RankingExec();
 		filmList = rankExecutioner.rankFilms(filmList, facebookPageList);
-		//System.out.println(filmList);
 		
 		return filmList;
 	}
 	
-	@GET
-	@Path("/test")
-	@Produces(MediaType.APPLICATION_JSON)
-	public List<Film> getFilmByLocationNameTest(@QueryParam("accessToken") String accessToken,
-												@QueryParam("location") String location) {
-    	
-    	FacebookExec fbExecutioner = new FacebookExec(accessToken);
-		List<FacebookPage> facebookPageList = fbExecutioner.getFacebookUserLikesTest();
-		List<Film> filmList = new ArrayList<Film>();
-		GenerationExec genExecutioner = new GenerationExec();
-		filmList = genExecutioner.getRelatedFilms(location);
-		RankingExec rankExecutioner = new RankingExec();
-		filmList = rankExecutioner.rankFilms(filmList, facebookPageList);
-
-		//System.out.println(filmList);
-		return filmList;
-		
-	}
 }

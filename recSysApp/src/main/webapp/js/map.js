@@ -1,6 +1,6 @@
 $(document).ready(function(){
 
-	var position_data;
+	var positionData;
 	
 	/**
 	 * Map configuration
@@ -8,7 +8,7 @@ $(document).ready(function(){
 	var view = new ol.View({
 	    center: [12.5113300, 41.8919300], //centered on Rome
 	    zoom: 12,
-		  projection: 'EPSG:4326' //or EPSG:3857
+		projection: 'EPSG:4326' //or EPSG:3857
 	
 	  });
 	
@@ -38,7 +38,7 @@ $(document).ready(function(){
 	      image: new ol.style.Icon(
 	        ({
 	          scale: 0.7,
-	          src:"https://raw.githubusercontent.com/jonataswalker/map-utils/master/images/marker.png"
+	          src:"./img/marker.png"
 	        }))});
 	
 	var map = new ol.Map({
@@ -92,7 +92,7 @@ $(document).ready(function(){
 	search.onclick = function(){
 		popup.setPosition(undefined);
 		closer.blur();
-		console.log(position_data);
+		searchFilms();
 	}
 	
 	map.addOverlay(popup);
@@ -122,8 +122,9 @@ $(document).ready(function(){
 	  	var coordinate = evt.coordinate;
 	    var hdms = ol.coordinate.toStringHDMS(ol.proj.transform(
 	        coordinate, 'EPSG:3857', 'EPSG:4326'));
-	    position_data = {
-				coordinate : coordinate,
+	    positionData = {
+				latitude : coordinate[1],
+				longitude : coordinate[0],
 				place : evt.address.original.details.attraction,
 				city : evt.address.original.details.city,
 				state : evt.address.original.details.state,
@@ -152,13 +153,12 @@ $(document).ready(function(){
 		    popup.setPosition(coord);
 
 		} else {
-			var coordinate = evt.map.getCoordinateFromPixel(evt.pixel);
 			markerLayer.getSource().clear();
+			var coordinate = evt.map.getCoordinateFromPixel(evt.pixel);
 			var newFeature = new ol.Feature({
 			         geometry : new ol.geom.Point(  ol.proj.fromLonLat([coordinate[0], coordinate[1]]) ),
 			         style : markerStyle
 			});
-			console.log(markerLayer.getSource().getFeatures());
 			markerLayer.getSource().addFeature(newFeature);
 			console.log(markerLayer.getSource().getFeatures());
 
@@ -178,8 +178,9 @@ $(document).ready(function(){
 				success: function(response){
 					console.log(response);
 					console.log(coordinate);
-					position_data = {
-							coordinate : coordinate,
+					positionData = {
+							latitude : coordinate[1],
+							longitude : coordinate[0],
 							place : response.name,
 							city : response.address.city,
 							state : response.address.state,
@@ -251,5 +252,43 @@ $(document).ready(function(){
 	  }
 	});
 	
+	function searchFilms(){
+		$(".overlay").show();
+	    // Check whether the user already logged in
+		FB.getLoginStatus(function(response) {
+	        if (response.status === 'connected') {    		        
+				$.ajax({
+					type: "GET",
+					url: "http://localhost:8080/recSysApp/rest/services/film/location/test",
+					data: {
+						accessToken : response.authResponse.accessToken,
+						latitude: positionData.latitude,
+						longitude: positionData.longitude,
+						place : positionData.place,
+						city : positionData.city,
+						state : positionData.state,
+						country : positionData.country
+					},
+					dataType: "json",
+					success: function(response){
+						console.log(response);
+						$(".overlay").hide();
+						alert("Success!");
+					},
+					error: function(result, status, error){
+						alert("Sorry, an error occurred. Please try again later");
+					}
+				})       
+	        }
+	        else{
+	        	//login
+	        	fbLogin();
+	        }
+	    });
+
+	};
+	
 }); //end of document ready
+
+
 
