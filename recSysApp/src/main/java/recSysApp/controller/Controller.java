@@ -9,6 +9,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -18,6 +19,7 @@ import com.restfb.types.User;
 import model.FacebookPage;
 import model.Film;
 import model.Location;
+import utils.LensKitHelper;
 
 
 @Path("/services")
@@ -45,7 +47,7 @@ public class Controller {
 	
 	
 	@GET
-	@Path("/film/location/test")
+	@Path("/film/location")
     @Produces(MediaType.APPLICATION_JSON)
 	public List<Film> getFilmByLocation(@QueryParam("accessToken") String accessToken,
 										@QueryParam("latitude") String latitude,
@@ -68,4 +70,14 @@ public class Controller {
 		return filmList;
 	}
 	
+	@GET
+	@Path("/film/askToRate/{n}")
+    @Produces(MediaType.APPLICATION_JSON)
+	public Map<String,Double> getAskToRateFilms(@PathParam("n") int n){
+		LensKitHelper lsh = new LensKitHelper();
+		Map<String,Double> map = lsh.getLogPopEntFilms();
+		
+		return map;
+		
+	}	
 }

@@ -10,7 +10,7 @@ import facade.FacadeUserImpl;
 import model.FacebookPage;
 import model.Film;
 import model.Location;
-import utils.LensKitTest;
+import utils.LensKitHelper;
 
 public class GenerationExec {
 	
@@ -27,10 +27,10 @@ public class GenerationExec {
 	public List<Film> getRelatedFilms(Location location) {
 		
 		FacadeFilm facadeFilm = new FacadeFilmImpl();
-		//LensKitTest lstest = new LensKitTest();
+		//LensKitHelper lsh = new LensKitHelper();
 		List<Film> testList = facadeFilm.getCandidateFilms(location);
 		/*try {
-			lstest.TestCount(testList);
+			lsh.TestCount(testList);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

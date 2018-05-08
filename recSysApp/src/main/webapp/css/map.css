@@ -1,6 +1,63 @@
+#filmPanel, #panel, #flip {
+    padding: 5px;
+    text-align: center;
+    background-color: #e5eecc;
+    border: solid 1px #c3c3c3;
+    display:none;
+}
+
+#panel {
+    padding: 5px;
+    display: none;
+}
+
+#filmPanel {
+    padding: 50px;
+    display: flex;
+    background-color: #FFFFFF;
+    border: none;
+}
+
+#lodPanel, #kitPanel{
+	padding: 45px;
+	background-color: #FFFFFF;
+	border: solid 1px #c3c3c3;
+	
+}
+
+#lodPanel {
+	display: flex;
+	flex-grow: 1;
+}
+
+#kitPanel{
+	display: flex;
+	flex-grow: 1;
+}
+
+.film {
+	flex-grow: 1;
+	background-color: #FFFFFF;
+	display: block;
+}
+
+
 .map{
 	position: relative;
 }
+
+.over-popup{
+	position: absolute;
+    display: none;
+    background-color: white;
+    border-radius: 10px;
+    border: 1px solid;
+    padding: 15px;
+    min-width: 280px;
+    max-width: 480px;
+    text-align: left;
+}
+
 .ol-popup {
         position: absolute;
         background-color: white;
@@ -49,3 +106,4 @@
 	  .ol-control button:hover { 
         background-color: rgba(40, 40, 40, 1) !important;
 	  }
+	  

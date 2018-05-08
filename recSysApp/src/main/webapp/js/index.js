@@ -1,7 +1,7 @@
 window.fbAsyncInit = function() {
     // FB JavaScript SDK configuration and setup
     FB.init({
-      appId      : '****', // FB App ID
+      appId      : config.FACEBOOK_APP_KEY, // FB App ID
       cookie     : true,  // enable cookies to allow the server to access the session
       xfbml      : true,  // parse social plugins on this page
       version    : 'v2.12' // use graph api version 2.12
@@ -112,7 +112,7 @@ $(document).ready(function(){
 		        		        
 		        				$.ajax({
 		        					type: "GET",
-		        					url: "http://localhost:8080/recSysApp/rest/services/film/location/test",
+		        					url: "http://localhost:8080/recSysApp/rest/services/film/location",
 		        					//contentType: "application/json; charset=utf-8",
 		        					data: {
 			        					accessToken : response.authResponse.accessToken,

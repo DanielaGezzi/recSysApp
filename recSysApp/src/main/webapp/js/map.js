@@ -118,7 +118,7 @@ $(document).ready(function(){
 	geocoder.on('addresschosen', function (evt) {
 	  	map.getLayers().getArray()[2].getSource().clear();
 	  	console.info(evt);
-	  	console.log(evt);
+	  	//console.log(evt);
 	  	var coordinate = evt.coordinate;
 	    var hdms = ol.coordinate.toStringHDMS(ol.proj.transform(
 	        coordinate, 'EPSG:3857', 'EPSG:4326'));
@@ -144,7 +144,7 @@ $(document).ready(function(){
 	map.on('click', function(evt){
 		var feature = map.forEachFeatureAtPixel(evt.pixel,
 		      function(feature, layer) {
-				console.log(map.getLayers());
+				//console.log(map.getLayers());
 		        return feature;
 		      });
 		if (feature) {
@@ -160,7 +160,7 @@ $(document).ready(function(){
 			         style : markerStyle
 			});
 			markerLayer.getSource().addFeature(newFeature);
-			console.log(markerLayer.getSource().getFeatures());
+			//console.log(markerLayer.getSource().getFeatures());
 
 			var hdms = ol.coordinate.toStringHDMS(ol.proj.transform(
 			        coordinate, 'EPSG:3857', 'EPSG:4326'));
@@ -176,8 +176,8 @@ $(document).ready(function(){
 				},
 				dataType: "json",
 				success: function(response){
-					console.log(response);
-					console.log(coordinate);
+					//console.log(response);
+					//console.log(coordinate);
 					positionData = {
 							latitude : coordinate[1],
 							longitude : coordinate[0],
@@ -253,13 +253,13 @@ $(document).ready(function(){
 	});
 	
 	function searchFilms(){
-		$(".overlay").show();
+		$.LoadingOverlay("show");
 	    // Check whether the user already logged in
 		FB.getLoginStatus(function(response) {
 	        if (response.status === 'connected') {    		        
 				$.ajax({
 					type: "GET",
-					url: "http://localhost:8080/recSysApp/rest/services/film/location/test",
+					url: "http://localhost:8080/recSysApp/rest/services/film/location",
 					data: {
 						accessToken : response.authResponse.accessToken,
 						latitude: positionData.latitude,
@@ -272,7 +272,9 @@ $(document).ready(function(){
 					dataType: "json",
 					success: function(response){
 						console.log(response);
-						$(".overlay").hide();
+						getFilmsInfo(response, function(){});
+						$.LoadingOverlay("hide");
+						$("#flip").show();
 						alert("Success!");
 					},
 					error: function(result, status, error){
@@ -288,6 +290,49 @@ $(document).ready(function(){
 
 	};
 	
+	$("#flip").click(function(){
+        $("#panel").slideToggle("slow");
+    });
+	
+	function getFilmsInfo(films, done){
+		var count = 0;
+		var max = 3;
+		while(count<3){
+			$.ajax({
+				type: "GET",
+				url: "http://www.omdbapi.com/?i="+ films[count].imdbId +"&apikey="+config.OMDB_API_KEY,
+				success: function(response){
+					if(response.Response == 'True'){
+						console.log(response.Response)
+						$('#lodPanel').append('<div class="film" data-tooltip=#'+ response.imdbID +'><img src='+ response.Poster +' style="max-height: 70%; max-width: 70%"></div>');
+						$('#lodPanel').append('<div class="over-popup" id='+ response.imdbID +'><p><b>Title</b>: '+ response.Title +'</p>'+
+																							   '<p><b>Year</b>: '+ response.Year +'</p>' +
+																							   '<p><b>Genre</b>: '+ response.Genre +'</p>' +
+																							   '<p><b>Director</b>: '+ response.Director +'</p>' +
+																							   '<p><b>Actors</b>: '+ response.Actors +'</p>' +
+																							   '<p><b>Plot</b>: '+ response.Plot +'</p></div>')
+					}else{ max++; }
+				},
+				error: function(result, status, error){
+					alert("Sorry, an error occurred retrieving film information. Please try again later");
+				}
+			})  
+			count++;
+		}	 
+		
+	}
+	
+	$("#lodPanel").on('mouseenter','.film', function(e) {
+	    $($(this).data("tooltip")).css({
+	        left: e.pageX + 1,
+	        top: e.pageY + 1
+	    }).stop().show(100);
+	})
+	.on('mouseleave','.film',function() {
+	    $($(this).data("tooltip")).hide();
+	});
+	
+		
 }); //end of document ready
 
 
