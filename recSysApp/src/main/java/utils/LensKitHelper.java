@@ -125,13 +125,11 @@ public class LensKitHelper {
 	        	testMap.put(film, (long) 0);
 	        }
         }
-        
-        
+            
         testMap = testMap.entrySet().stream().sorted(Entry.<Film,Long>comparingByValue().reversed())
 				.collect(Collectors.toMap(Entry::getKey, Entry::getValue,
 				(e1, e2) -> e1, LinkedHashMap::new));
-        
-            
+              
         FileWriter fileWriter = new FileWriter("test.txt");
         PrintWriter printWriter = new PrintWriter(fileWriter); 
         
@@ -143,7 +141,7 @@ public class LensKitHelper {
         printWriter.close();
 		
 	}
-
+	
 	public Map<String,Double> getLogPopEntFilms() {
 		File file = new File(getClass().getClassLoader().getResource("movielens.yml").getFile());
 		Path dataFile = Paths.get(file.getPath());
@@ -160,51 +158,70 @@ public class LensKitHelper {
         Map<String, Double> filmLogPopEntr = new LinkedHashMap<String, Double>(); 
 		try (ObjectStream<Entity> movies = dao.query(EntityType.forName("item-ids")).stream()) {
 			for(Entity e: movies) {
-				double logPopEntr = getLogPopularityEntropy((Long) e.maybeGet("id"), dao);;
+				double logPopEntr = getLogPopularityEntropy((Long) e.maybeGet("id"), dao);
 				filmLogPopEntr.put(e.maybeGet("imdbid").toString(), logPopEntr);
 			}
 		}catch(Exception e) {
 			e.printStackTrace();
-		}
-		
-		return filmLogPopEntr;
-        
+		}		
+		return filmLogPopEntr;        
 	}
 	
 	public double getLogPopularityEntropy(Long id, DataAccessObject dao) {
 		double entropy = 0;
-		int popularity = 0; //n of user who rated film
-		try (ObjectStream<Rating> ratings = dao.query(Rating.class).stream()) {
-			Map<Double, Integer> ratingValuesFrequency = new HashMap<Double, Integer>();
-			for (Rating r: ratings) {
-				if(r.getItemId() == id) {
-					popularity = popularity + 1;
-					if(!ratingValuesFrequency.containsKey(r.getValue())) {
-						ratingValuesFrequency.put((double) r.getValue(), 1);
-					}else {
-						ratingValuesFrequency.put((double) r.getValue(), ratingValuesFrequency.get(r.getValue()) + 1);
-					}
-					
+		int popularity = dao.query(Rating.class).withAttribute(CommonAttributes.ITEM_ID, id).count(); //n of user who rated film
+		Map<Double, Integer> ratingValuesFrequency = new HashMap<Double, Integer>();
+		List<Rating> ratings = dao.query(Rating.class).withAttribute(CommonAttributes.ITEM_ID, id).get();
+		for (Rating r: ratings) {
+			if(r.getItemId() == id) {
+				if(!ratingValuesFrequency.containsKey(r.getValue())) {
+					ratingValuesFrequency.put((double) r.getValue(), 1);
+				}else {
+					ratingValuesFrequency.put((double) r.getValue(), ratingValuesFrequency.get(r.getValue()) + 1);
 				}
 			}
-			for(double value: ratingValuesFrequency.keySet()) {
-				double proportion = value/popularity;
-				entropy += proportion*Math.log(proportion);
-			}
-		}catch(Exception e) {
-			e.printStackTrace();
+		}
+		for(double value: ratingValuesFrequency.keySet()) {
+			double proportion = value/popularity;
+			entropy += proportion*Math.log(proportion);
 		}
 		entropy = - entropy;
-		System.out.println(Math.log(popularity) * entropy);
 		return Math.log(popularity) * entropy;
 	}
 	
-	
 	public double getEntropy(Long id, DataAccessObject dao) {
 		double entropy = 0;
+		Map<Double, Integer> ratingValuesFrequency = new HashMap<Double, Integer>();
+		int numberOfUsers = 0; //n of user who rated film		
+		List<Rating> ratings = dao.query(Rating.class).withAttribute(CommonAttributes.ITEM_ID, id).get();
+		for (Rating r: ratings) {
+			if(r.getItemId() == id) {
+				numberOfUsers = numberOfUsers + 1;
+				if(!ratingValuesFrequency.containsKey(r.getValue())) {
+					ratingValuesFrequency.put((double) r.getValue(), 1);
+				}else {
+					ratingValuesFrequency.put((double) r.getValue(), ratingValuesFrequency.get(r.getValue()) + 1);
+				}				
+			}
+		}
+		for(double value: ratingValuesFrequency.keySet()) {
+			double proportion = value/numberOfUsers;
+			entropy += proportion*Math.log(proportion);
+		}	
+		return - entropy;
+	}
+	
+	public double getPopularity(Long id, DataAccessObject dao) {
+		//number of ratings for a film
+		return dao.query(Rating.class).withAttribute(CommonAttributes.ITEM_ID, id).count();
+	}
+	
+	/*old one 
+	public double getEntropy(Long id, DataAccessObject dao) {
+		double entropy = 0;
+		int numberOfUsers = 0; //n of user who rated film
 		try (ObjectStream<Rating> ratings = dao.query(Rating.class).stream()) {
 			Map<Double, Integer> ratingValuesFrequency = new HashMap<Double, Integer>();
-			int numberOfUsers = 0; //n of user who rated film
 			for (Rating r: ratings) {
 				if(r.getItemId() == id) {
 					numberOfUsers = numberOfUsers + 1;
@@ -223,22 +240,8 @@ public class LensKitHelper {
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
-		System.out.println(entropy);
 		return - entropy;
 	}
-	
-	public double getPopularity(Long id, DataAccessObject dao) {
-		double popularity = 0;
-		try (ObjectStream<Rating> ratings = dao.query(Rating.class).stream()) {
-			for (Rating r: ratings) {
-				if(r.getItemId() == id) {
-					popularity = popularity +1;
-				}
-			}
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
-		return popularity;
-	}
+*/
 	
 }
