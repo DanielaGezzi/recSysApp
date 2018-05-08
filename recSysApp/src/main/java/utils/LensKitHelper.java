@@ -160,9 +160,7 @@ public class LensKitHelper {
         Map<String, Double> filmLogPopEntr = new LinkedHashMap<String, Double>(); 
 		try (ObjectStream<Entity> movies = dao.query(EntityType.forName("item-ids")).stream()) {
 			for(Entity e: movies) {
-				double entropy = getEntropy((Long) e.maybeGet("id"), dao);
-				double popularity = getPopularity((Long) e.maybeGet("id"), dao);
-				double logPopEntr = Math.log(popularity) * entropy;
+				double logPopEntr = getLogPopularityEntropy((Long) e.maybeGet("id"), dao);;
 				filmLogPopEntr.put(e.maybeGet("imdbid").toString(), logPopEntr);
 			}
 		}catch(Exception e) {
@@ -171,6 +169,34 @@ public class LensKitHelper {
 		
 		return filmLogPopEntr;
         
+	}
+	
+	public double getLogPopularityEntropy(Long id, DataAccessObject dao) {
+		double entropy = 0;
+		int popularity = 0; //n of user who rated film
+		try (ObjectStream<Rating> ratings = dao.query(Rating.class).stream()) {
+			Map<Double, Integer> ratingValuesFrequency = new HashMap<Double, Integer>();
+			for (Rating r: ratings) {
+				if(r.getItemId() == id) {
+					popularity = popularity + 1;
+					if(!ratingValuesFrequency.containsKey(r.getValue())) {
+						ratingValuesFrequency.put((double) r.getValue(), 1);
+					}else {
+						ratingValuesFrequency.put((double) r.getValue(), ratingValuesFrequency.get(r.getValue()) + 1);
+					}
+					
+				}
+			}
+			for(double value: ratingValuesFrequency.keySet()) {
+				double proportion = value/popularity;
+				entropy += proportion*Math.log(proportion);
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		entropy = - entropy;
+		System.out.println(Math.log(popularity) * entropy);
+		return Math.log(popularity) * entropy;
 	}
 	
 	
