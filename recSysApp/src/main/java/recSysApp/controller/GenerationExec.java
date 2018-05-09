@@ -1,6 +1,5 @@
 package recSysApp.controller;
 
-import java.io.IOException;
 import java.util.List;
 import com.restfb.types.User;
 import facade.FacadeFilm;
@@ -10,7 +9,6 @@ import facade.FacadeUserImpl;
 import model.FacebookPage;
 import model.Film;
 import model.Location;
-import utils.LensKitHelper;
 
 public class GenerationExec {
 	

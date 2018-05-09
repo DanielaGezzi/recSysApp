@@ -1,5 +1,6 @@
 package recSysApp.controller;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +17,10 @@ import javax.ws.rs.core.Response;
 import com.google.gson.Gson;
 import com.restfb.types.User;
 
+import facade.FacadeLensKit;
+import facade.FacadeLensKitImpl;
+import facade.FacadeUser;
+import facade.FacadeUserImpl;
 import model.FacebookPage;
 import model.Film;
 import model.Location;
@@ -58,7 +63,7 @@ public class Controller {
 										@QueryParam("country") String country) {
 
 		Location location = new Location(name, city, state, country, latitude, longitude);
-		System.out.println(location);
+		//System.out.println(location);
 		FacebookExec fbExecutioner = new FacebookExec(accessToken);
 		User facebookUser = fbExecutioner.getFacebookUserInfo();
 		GenerationExec genExecutioner = new GenerationExec();
@@ -73,11 +78,29 @@ public class Controller {
 	@GET
 	@Path("/film/askToRate/{n}")
     @Produces(MediaType.APPLICATION_JSON)
-	public Map<String,Double> getAskToRateFilms(@PathParam("n") int n){
-		LensKitHelper lsh = new LensKitHelper();
-		Map<String,Double> map = lsh.getLogPopEntFilms();
-		
-		return map;
+	public List<String> getAskToRateFilms(@PathParam("n") int n){
+		FacadeLensKit facadeLensKit = new FacadeLensKitImpl();
+		return facadeLensKit.getLogPopularityEntropyFilms().subList(0, n);
 		
 	}	
+	
+	@POST
+	@Path("/film/newRatings")	
+    @Consumes(MediaType.APPLICATION_JSON)
+	public Response saveUserRatings(String requestPayload) {
+		
+		Gson gson = new Gson();
+		@SuppressWarnings("unchecked")
+		Map<String, Object> map = gson.fromJson(requestPayload, Map.class);
+		Map<String, Object> ratings = gson.fromJson((String) map.get("ratings"), Map.class);
+    	/*String accessToken = map.get("accessToken");
+		FacebookExec fbExecutioner = new FacebookExec(accessToken);
+		User facebookUser = fbExecutioner.getFacebookUserInfo();
+		FacadeUser facadeUser = new FacadeUserImpl();
+		model.User user = facadeUser.getUser(facebookUser);
+		FacadeLensKit facadeLensKit = new FacadeLensKitImpl();
+		facadeLensKit.saveRatings(user.getId(), map.get(key));*/
+		System.out.println(ratings);
+		return Response.status(200).build();
+	}
 }

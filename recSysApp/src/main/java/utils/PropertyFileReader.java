@@ -19,11 +19,8 @@ public class PropertyFileReader {
 			//reading property
 		    Map<String, String> prop = new HashMap<String, String>();
 		    		    
-		    if(props.containsKey("appId"))
-	        	prop.put("appId", props.getProperty("appId"));	
-		    
-		    if(props.containsKey("appSecret"))
-	        	prop.put("appSecret", props.getProperty("appSecret"));
+		    if(props.containsKey("userId"))
+	        	prop.put("userId", props.getProperty("userId"));	
 		        
 		    return prop;
 		    

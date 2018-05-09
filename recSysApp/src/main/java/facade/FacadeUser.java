@@ -3,10 +3,12 @@ package facade;
 import java.util.List;
 
 import model.FacebookPage;
+import model.User;
 
 public interface FacadeUser {
 
-	public void saveUserfromFacebook(com.restfb.types.User user);
-	public void saveUserLikes(com.restfb.types.User facebookUser, List<FacebookPage> facebookPageList);
-	public List<FacebookPage> getUserLikes(com.restfb.types.User facebookUser);
+	void saveUserfromFacebook(com.restfb.types.User user);
+	void saveUserLikes(com.restfb.types.User facebookUser, List<FacebookPage> facebookPageList);
+	List<FacebookPage> getUserLikes(com.restfb.types.User facebookUser);
+	User getUser(com.restfb.types.User user);
 }

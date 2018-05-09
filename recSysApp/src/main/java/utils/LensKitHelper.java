@@ -40,10 +40,10 @@ import org.lenskit.util.io.ObjectStream;
 
 import com.google.common.base.Throwables;
 
-import it.unimi.dsi.fastutil.longs.Long2DoubleOpenHashMap;
 import model.Film;
 
 public class LensKitHelper {
+	
 
 	public void testRec() {
 		Path dataFile = Paths.get("src/main/resources/movielens.yml");
@@ -92,7 +92,6 @@ public class LensKitHelper {
                 System.out.format("\t%d (%s): %d %.2f\n", item.getId(), name, imdbID, item.getScore());
             }
 		} catch (RecommenderBuildException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -142,106 +141,6 @@ public class LensKitHelper {
 		
 	}
 	
-	public Map<String,Double> getLogPopEntFilms() {
-		File file = new File(getClass().getClassLoader().getResource("movielens.yml").getFile());
-		Path dataFile = Paths.get(file.getPath());
-		DataAccessObject dao;
-        try {
-            StaticDataSource data = StaticDataSource.load(dataFile);
-            // get the data from the DAO
-            dao = data.get();
-        } catch (IOException e) {
-            System.out.println("cannot load data" + e);
-            throw Throwables.propagate(e);
-        }
-        
-        Map<String, Double> filmLogPopEntr = new LinkedHashMap<String, Double>(); 
-		try (ObjectStream<Entity> movies = dao.query(EntityType.forName("item-ids")).stream()) {
-			for(Entity e: movies) {
-				double logPopEntr = getLogPopularityEntropy((Long) e.maybeGet("id"), dao);
-				filmLogPopEntr.put(e.maybeGet("imdbid").toString(), logPopEntr);
-			}
-		}catch(Exception e) {
-			e.printStackTrace();
-		}		
-		return filmLogPopEntr;        
-	}
-	
-	public double getLogPopularityEntropy(Long id, DataAccessObject dao) {
-		double entropy = 0;
-		int popularity = dao.query(Rating.class).withAttribute(CommonAttributes.ITEM_ID, id).count(); //n of user who rated film
-		Map<Double, Integer> ratingValuesFrequency = new HashMap<Double, Integer>();
-		List<Rating> ratings = dao.query(Rating.class).withAttribute(CommonAttributes.ITEM_ID, id).get();
-		for (Rating r: ratings) {
-			if(r.getItemId() == id) {
-				if(!ratingValuesFrequency.containsKey(r.getValue())) {
-					ratingValuesFrequency.put((double) r.getValue(), 1);
-				}else {
-					ratingValuesFrequency.put((double) r.getValue(), ratingValuesFrequency.get(r.getValue()) + 1);
-				}
-			}
-		}
-		for(double value: ratingValuesFrequency.keySet()) {
-			double proportion = value/popularity;
-			entropy += proportion*Math.log(proportion);
-		}
-		entropy = - entropy;
-		return Math.log(popularity) * entropy;
-	}
-	
-	public double getEntropy(Long id, DataAccessObject dao) {
-		double entropy = 0;
-		Map<Double, Integer> ratingValuesFrequency = new HashMap<Double, Integer>();
-		int numberOfUsers = 0; //n of user who rated film		
-		List<Rating> ratings = dao.query(Rating.class).withAttribute(CommonAttributes.ITEM_ID, id).get();
-		for (Rating r: ratings) {
-			if(r.getItemId() == id) {
-				numberOfUsers = numberOfUsers + 1;
-				if(!ratingValuesFrequency.containsKey(r.getValue())) {
-					ratingValuesFrequency.put((double) r.getValue(), 1);
-				}else {
-					ratingValuesFrequency.put((double) r.getValue(), ratingValuesFrequency.get(r.getValue()) + 1);
-				}				
-			}
-		}
-		for(double value: ratingValuesFrequency.keySet()) {
-			double proportion = value/numberOfUsers;
-			entropy += proportion*Math.log(proportion);
-		}	
-		return - entropy;
-	}
-	
-	public double getPopularity(Long id, DataAccessObject dao) {
-		//number of ratings for a film
-		return dao.query(Rating.class).withAttribute(CommonAttributes.ITEM_ID, id).count();
-	}
-	
-	/*old one 
-	public double getEntropy(Long id, DataAccessObject dao) {
-		double entropy = 0;
-		int numberOfUsers = 0; //n of user who rated film
-		try (ObjectStream<Rating> ratings = dao.query(Rating.class).stream()) {
-			Map<Double, Integer> ratingValuesFrequency = new HashMap<Double, Integer>();
-			for (Rating r: ratings) {
-				if(r.getItemId() == id) {
-					numberOfUsers = numberOfUsers + 1;
-					if(!ratingValuesFrequency.containsKey(r.getValue())) {
-						ratingValuesFrequency.put((double) r.getValue(), 1);
-					}else {
-						ratingValuesFrequency.put((double) r.getValue(), ratingValuesFrequency.get(r.getValue()) + 1);
-					}
-					
-				}
-			}
-			for(double value: ratingValuesFrequency.keySet()) {
-				double proportion = value/numberOfUsers;
-				entropy += proportion*Math.log(proportion);
-			}
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
-		return - entropy;
-	}
-*/
+
 	
 }

@@ -8,6 +8,8 @@ import model.User;
 public interface UserRepository {
 	
 	void saveUser(User user);
+	
+	public User getUser(String userFbId);
 
 	void saveUserLike(String userID, String facebookID);
 	

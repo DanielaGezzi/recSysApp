@@ -49,11 +49,11 @@ public class User {
 		this.facebookID = facebookID;
 	}
 
-	
 	@Override
 	public String toString() {
-		return "User [facebookID=" + facebookID + ", name=" + name + ", surname=" + surname + "]";
+		return "User [id=" + id + ", facebookID=" + facebookID + ", name=" + name + ", surname=" + surname + "]";
 	}
+
 
 	
 }

@@ -105,10 +105,6 @@ $(document).ready(function(){
 			FB.getLoginStatus(function(response) {
 		        if (response.status === 'connected') {
     					console.log(response);
-		        		 var json = {
-		        					accessToken : response.authResponse.accessToken,
-		        					location: "Rome"
-		        				}
 		        		        
 		        				$.ajax({
 		        					type: "GET",
@@ -138,6 +134,45 @@ $(document).ready(function(){
 		    });
 		
 		});
+	
+	$("#buttonInsertRatings").on("click", function(){
+		FB.getLoginStatus(function(response) {
+	        if (response.status === 'connected') {
+	        	var json = {
+    					accessToken : response.authResponse.accessToken,
+    					ratings : [
+    						{
+	    						imdbid: "abcdefg",
+	    						rating: 2
+    						},
+    						{
+    							imdbid: "hilmno",
+    							rating: 0.5
+    						
+    						}
+    					]
+    				}
+	        	
+	        	$.ajax({
+					type: "POST",
+					url: "http://localhost:8080/recSysApp/rest/services/film/newRatings",
+					contentType: "application/json",
+					data: JSON.stringify(json),
+					success: function(response){
+						alert("Success!");
+					},
+					error: function(result, status, error){
+						alert("Sorry, an error occurred. Please try again later");
+					}
+				})
+	        }
+			else{
+				//login
+				fbLogin();
+			}
+		});
+		
+	});
 	
 });
 

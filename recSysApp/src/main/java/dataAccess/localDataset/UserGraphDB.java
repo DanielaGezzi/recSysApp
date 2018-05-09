@@ -37,7 +37,8 @@ public class UserGraphDB implements UserRepository {
 		                  .setNamespace("user","http://test/resource/user/")
 				  .subject("user:" + user.getFacebookID())
 				       .add(RDF.TYPE, "db:user")
-				       .add("user:userid", user.getFacebookID())
+				       .add("user:userId", user.getId())
+				       .add("user:userFbId", user.getFacebookID())
 				       .add(RDFS.LABEL, user.getName() + " " + user.getSurname())
 				       .add(FOAF.FIRST_NAME, user.getName())
 				       .add(FOAF.SURNAME, user.getSurname())
@@ -46,22 +47,60 @@ public class UserGraphDB implements UserRepository {
 		execute(model);
 		
 	}
+	
+	public User getUser(String userFbId) {
+		User user = new User();
+		user.setFacebookID(userFbId);
+		String query = "PREFIX db: <http://test/resource/>" + 
+					   "PREFIX user: <http://test/resource/user/>" + 
+					   "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>" + 
+					   "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>" + 
+					   "SELECT ?user ?user_id ?label" +
+							"WHERE {" + 
+							"    ?user rdf:type db:user." + 
+							"    ?user user:userFbId \"" + userFbId +"\"." + 
+							"    ?user user:userId ?user_id." + 
+							"    ?user rdfs:label ?label." + 
 
-	public void saveUserLike(String userid, String facebookID) {
+					   "}";
+		
+		try {	
+		    RepositoryConnection connection = repository.getConnection();
+		    try{
+		    	TupleQueryResult resultSet = connection.prepareTupleQuery(QueryLanguage.SPARQL,query).evaluate();
+		    
+				
+				for (;resultSet.hasNext();) {
+				      BindingSet soln = resultSet.next();
+				      System.out.println(soln);
+				      String id = soln.getValue("user_id").stringValue();
+				      user.setId(id);
+			    }
+		    }
+			finally{
+				connection.close();
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return user;
+	}
+
+	public void saveUserLike(String userFbID, String facebookPageID) {
 		
 		ModelBuilder builder = new ModelBuilder();
 		Model model = builder
 		                  .setNamespace("fbpage", "http://test/resource/fbpage/")
 		                  .setNamespace("user","http://test/resource/user/")
-				  .subject("user:" + userid)
-				       .add("user:likes_fbpage", "fbpage:"+facebookID)
+				  .subject("user:" + userFbID)
+				       .add("user:likes_fbpage", "fbpage:"+facebookPageID)
 				  .build();
 		
 		execute(model);
 		
 	}
 	
-	public List<FacebookPage> getUserLikes(String userID){
+	public List<FacebookPage> getUserLikes(String userFbID){
 		List<FacebookPage> userLikes = new ArrayList<FacebookPage>();
 		String query = 	"PREFIX db: <http://test/resource/>" + 
 						"PREFIX user: <http://test/resource/user/>" + 
@@ -71,7 +110,7 @@ public class UserGraphDB implements UserRepository {
 						"SELECT ?user ?fbPage ?fbPage_id ?fbPage_label ?fbPage_cat " +
 							"WHERE {" + 
 							"    ?user rdf:type db:user." + 
-							"    ?user user:userid \"" + userID +"\"." + 
+							"    ?user user:userFbId \"" + userFbID +"\"." + 
 							"    ?user user:likes_fbpage ?fbPage." + 
 						    "	 ?fbPage fbpage:fbpageid ?fbPage_id." +
 							"    ?fbPage rdfs:label ?fbPage_label." + 
