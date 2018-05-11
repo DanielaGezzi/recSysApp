@@ -1,6 +1,6 @@
 package recSysApp.controller;
 
-import java.util.LinkedHashMap;
+
 import java.util.List;
 import java.util.Map;
 
@@ -92,7 +92,7 @@ public class Controller {
 		Gson gson = new Gson();
 		@SuppressWarnings("unchecked")
 		Map<String, Object> map = gson.fromJson(requestPayload, Map.class);
-		Map<String, Object> ratings = gson.fromJson((String) map.get("ratings"), Map.class);
+		List<Object> ratings = (List<Object>) map.get("ratings");
     	/*String accessToken = map.get("accessToken");
 		FacebookExec fbExecutioner = new FacebookExec(accessToken);
 		User facebookUser = fbExecutioner.getFacebookUserInfo();
