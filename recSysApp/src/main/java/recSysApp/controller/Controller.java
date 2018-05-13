@@ -92,14 +92,14 @@ public class Controller {
 		Gson gson = new Gson();
 		@SuppressWarnings("unchecked")
 		Map<String, Object> map = gson.fromJson(requestPayload, Map.class);
-		List<Object> ratings = (List<Object>) map.get("ratings");
-    	/*String accessToken = map.get("accessToken");
+		Map<String, Double> ratings = (Map<String,Double>) map.get("ratings");
+    	String accessToken = (String) map.get("accessToken");
 		FacebookExec fbExecutioner = new FacebookExec(accessToken);
 		User facebookUser = fbExecutioner.getFacebookUserInfo();
 		FacadeUser facadeUser = new FacadeUserImpl();
 		model.User user = facadeUser.getUser(facebookUser);
 		FacadeLensKit facadeLensKit = new FacadeLensKitImpl();
-		facadeLensKit.saveRatings(user.getId(), map.get(key));*/
+		facadeLensKit.saveRatings(Long.parseLong(user.getId()), ratings);
 		System.out.println(ratings);
 		return Response.status(200).build();
 	}

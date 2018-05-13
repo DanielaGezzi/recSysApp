@@ -2,21 +2,24 @@
 <html>
 <head>
 <meta charset="ISO-8859-1">
-<title>Welcome!</title>
+<title>Rate films to start</title>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="js/jquery.barrating.min.js"></script>
 <script type='text/javascript' src='js/config.js'></script>
-<script type="text/javascript" src="js/index.js"></script>
+<script type="text/javascript" src="js/fblogin.js"></script>
+<script type="text/javascript" src="js/asktorate.js"></script>
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css">
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+<link rel="stylesheet" href="css/fontawesome-stars.css">
 <link rel="stylesheet" href="css/bootstrap.social.css">
+<link rel="stylesheet" href="css/navbar.css">
 <link rel="stylesheet" href="css/index.css">
-
-
+<link rel="stylesheet" href="css/asktorate.css">
 </head>
 <body>
-	<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
       <a class="navbar-brand" href="#">RecSysApp</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -27,17 +30,19 @@
           <li class="nav-item active">
             <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
           </li>
-        </ul>    
-         <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Logout</button>
+        </ul>
+         <button id="btn-continue" class="btn btn-outline-success my-2 my-sm-0" type="submit">Continue!</button>    
+         <button id="btn-fb-logout" class="btn btn-outline-success my-2 my-sm-0" type="submit">Logout</button>
       </div>
     </nav>
     <div class="container">
-	    <div class="fb-login-container">
-	    <p>Please, sign in.</p>
-				<button href="#" class="btn btn-block btn-social btn-facebook">
-			   	 <span class="fab fa-facebook"></span> Sign in with Facebook
-			   	 </button>
-	  	</div>
-  	</div>
+   	 <div id="film-panel" class="film-panel">
+   	 <div id="loading-panel" class="loading-panel">
+   	 <p id="loading-film-text">Please wait... Loading movies...</p>
+   	 <img id="loading-img" src="./img/loading.gif"/>
+   	 </div>
+	</div>
+    </div>
+
 </body>
 </html>

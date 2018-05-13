@@ -8,7 +8,6 @@ window.fbAsyncInit = function() {
     });
 };
 
-
 // Facebook login with JavaScript SDK
 function fbLogin() {	
     FB.login(function (response) {    	
@@ -18,58 +17,45 @@ function fbLogin() {
         } else {        	
             document.getElementById('status').innerHTML = 'User cancelled login or did not fully authorize.';
         }       
-    },{scope: 'public_profile,user_likes'});
-    
+    },{scope: 'public_profile,user_likes'});    
 }
-
 
 //Fetch the user profile data from facebook
 function getFbUserData(userAccessToken){
-    FB.api('/me', {locale: 'en_US', fields: 'id,first_name,last_name,link,gender,locale,picture'},
+    FB.api('/me', {locale: 'en_US', fields: 'first_name'},
     function (response) {
-        document.getElementById('buttonFacebook').setAttribute("onclick","fbLogout()");
-        document.getElementById('status').innerHTML = 'Thanks for logging in, ' + response.first_name + '!';
-        document.getElementById('userData').innerHTML = '<p><b>FB ID:</b> '+ response.id +
-        												'</p><p><b>Name:</b> '+ response.first_name+' '+ response.last_name +
-        												'</p><p><b>Gender:</b> '+response.gender +
-        												'</p><p><b>Locale:</b> '+ response.locale +
-        												'</p><p><b>Picture:</b> <img src="'+ response.picture.data.url +
-        												'"/></p><p><b>FB Profile:</b> <a target="_blank" href="'+ response.link+'">click to view profile</a></p>';
-        
-        var json = {
-			accessToken : userAccessToken
-		}
+		document.getElementById('btn-fb-login').style.display = "none";
+        document.getElementById('text-fb-login').innerHTML = ''; 
+        document.getElementById('text-fb-login').innerHTML = 'Thanks for logging in, <b>' + response.first_name + '</b>!<br>We are retrieving some info about you, please wait...';
+		document.getElementById('loading-img').style.display = "block";
+      
+        var json = {accessToken : userAccessToken}
         
 		$.ajax({
 			type: "POST",
-			url: "http://localhost:8080/recSysApp/rest/services/facebook/user",
+			url: "/recSysApp/rest/services/facebook/user",
 			contentType: "application/json",
 			data: JSON.stringify(json),
 			success: function(response){
-				alert("Success!");
+				window.location.replace("/recSysApp/asktorate.html");
 			},
 			error: function(result, status, error){
 				alert("Sorry, an error occurred. Please try again later");
 			}
 		})
-        console.log(response);
-    });
-        
+        //console.log(response);
+    });       
 }
-
 
 // Logout from facebook
 function fbLogout() {
     FB.logout(function(response) {
-		document.getElementById('facebookLogin').setAttribute("hidden", true);
-        document.getElementById('fbLink').setAttribute("onclick","fbLogin()");
-        document.getElementById('fbLink').innerHTML = '<img src="fblogin.png"/>';
-        document.getElementById('userData').innerHTML = '';
-        document.getElementById('status').innerHTML = 'You have successfully logout from Facebook.';
+		document.getElementById('btn-fb-login').style.display = "block";
+        alert('You have successfully logout from Facebook.');
     });
 }
 
-
+//document ready
 $(document).ready(function(){
 	
 	//Load the JavaScript SDK asynchronously
@@ -80,15 +66,11 @@ $(document).ready(function(){
 	    js.src = "//connect.facebook.net/en_US/sdk.js";
 	    fjs.parentNode.insertBefore(js, fjs);
 	}(document, 'script', 'facebook-jssdk'));
-    
-    
-	$("#buttonFacebook").on("click", function(){
-		
-		document.getElementById('facebookLogin').setAttribute("hidden", true);
-	    // Check whether the user already logged in
+       
+	$("#btn-fb-login").on("click", function(){		
+	    // Check whether the user already logged in and accepted app
 		FB.getLoginStatus(function(response) {
 	        if (response.status === 'connected') {
-	        	//get user data
 	            getFbUserData(response.authResponse.accessToken);
 	        }
 	        else{
@@ -96,8 +78,16 @@ $(document).ready(function(){
 	        	fbLogin();
 	        }
 	    });
-	
 	});
+	
+    $('#btn-fb-logout').on("click",function(){
+    	FB.getLoginStatus(function(response) {
+	        if (response.status === 'connected') {
+	        	fbLogout();
+	        }
+	    });
+    });
+
 	
 	$("#buttonSearchFilm").on("click", function(){
 			
@@ -176,10 +166,10 @@ $(document).ready(function(){
 	
 });
 
-
+/*
 $(document).ajaxStart(function() {
 	  $("#waitGif").show();
 	}).ajaxStop(function() {
 	  $("#waitGif").hide();
 	});
-
+*/
