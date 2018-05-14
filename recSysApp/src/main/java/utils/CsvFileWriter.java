@@ -12,11 +12,10 @@ public class CsvFileWriter {
 	
 	public static void writeCsvFile(String fileName, String string) {
 		
-		
 		FileWriter fileWriter = null;
 				
 		try {
-			fileWriter = new FileWriter(fileName);
+			fileWriter = new FileWriter(fileName,true);
 
 			//Write new data
 			
@@ -29,7 +28,7 @@ public class CsvFileWriter {
 			
 		} finally {
 			
-			try {
+			try {		
 				fileWriter.flush();
 				fileWriter.close();
 			} catch (IOException e) {

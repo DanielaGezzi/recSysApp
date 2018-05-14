@@ -38,10 +38,10 @@ public class GenerationExec {
 
 	}
 	
-	public List<FacebookPage> getUserFacebookLikes(User facebookUser){
+	public List<FacebookPage> getUserFacebookLikes(String facebookUserId){
 		
 		FacadeUser facadeUser = new FacadeUserImpl();
-		return facadeUser.getUserLikes(facebookUser);
+		return facadeUser.getUserLikes(facebookUserId);
 		
 	}
 

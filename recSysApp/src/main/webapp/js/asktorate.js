@@ -6,7 +6,6 @@ $(document).ready(function(){
 		success: function(response){
 			document.getElementById('loading-panel').style.display = "none";
 			var count = 0;
-			console.log(response);
 			while(count<response.length){
 				$.ajax({
 					type: "GET",
@@ -66,7 +65,6 @@ $(document).ready(function(){
 	    var valueSelected = optionSelected.val();
 	    var imdbid = $(this).data("tooltip").substring(3);
 	    ratings[imdbid] = valueSelected;
-	    console.log(Object.keys(ratings).length);
 	    if(Object.keys(ratings).length==10){
 	    	document.getElementById('btn-continue').style.display = "block";
 	    }else{
@@ -95,7 +93,7 @@ $(document).ready(function(){
 					contentType: "application/json",
 					data: JSON.stringify(json),
 					success: function(response){
-						alert("Success!");
+						window.location.replace("/recSysApp/map.html");
 					},
 					error: function(result, status, error){
 						alert("Sorry, an error occurred. Please try again later");

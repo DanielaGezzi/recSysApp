@@ -272,13 +272,14 @@ $(document).ready(function(){
 					dataType: "json",
 					success: function(response){
 						console.log(response);
-						getFilmsInfo(response, function(){});
+						document.getElementById('film-panel').style.display = "flex";
+						getFilmsInfoW2V(response.w2v, function(){});
+						getFilmsInfoLK(response.lk, function(){});
 						$.LoadingOverlay("hide");
-						$("#flip").show();
-						alert("Success!");
 					},
 					error: function(result, status, error){
 						alert("Sorry, an error occurred. Please try again later");
+						$.LoadingOverlay("hide");
 					}
 				})       
 	        }
@@ -290,27 +291,30 @@ $(document).ready(function(){
 
 	};
 	
-	$("#flip").click(function(){
-        $("#panel").slideToggle("slow");
-    });
 	
-	function getFilmsInfo(films, done){
+	function getFilmsInfoW2V(films, done){
 		var count = 0;
-		var max = 3;
-		while(count<3){
+		var max = 5;
+		while(count<max){
 			$.ajax({
 				type: "GET",
 				url: "http://www.omdbapi.com/?i="+ films[count].imdbId +"&apikey="+config.OMDB_API_KEY,
 				success: function(response){
 					if(response.Response == 'True'){
-						console.log(response.Response)
-						$('#lodPanel').append('<div class="film" data-tooltip=#'+ response.imdbID +'><img src='+ response.Poster +' style="max-height: 70%; max-width: 70%"></div>');
-						$('#lodPanel').append('<div class="over-popup" id='+ response.imdbID +'><p><b>Title</b>: '+ response.Title +'</p>'+
-																							   '<p><b>Year</b>: '+ response.Year +'</p>' +
-																							   '<p><b>Genre</b>: '+ response.Genre +'</p>' +
-																							   '<p><b>Director</b>: '+ response.Director +'</p>' +
-																							   '<p><b>Actors</b>: '+ response.Actors +'</p>' +
-																							   '<p><b>Plot</b>: '+ response.Plot +'</p></div>')
+						$('#film-panel-w2v').append('<div class="film" data-tooltip=#'+ response.imdbID +'>' +
+														'<div class="poster" data-tooltip=#'+ response.imdbID +'>' +
+														'<a href="https:\/\/www.imdb.com\/title\/'+ response.imdbID +'" target="_blank">'+
+														'<img src='+ response.Poster +' style="width:150px; height:auto"></a>' +
+														'</div>' +
+														'<p>'+ response.Title +'</p>' +														
+														'</div>');
+						$('#film-panel-w2v').append('<div class="over-popup" id='+ response.imdbID +'>'+
+													'<p><b>Title</b>: '+ response.Title +'</p>'+
+													'<p><b>Year</b>: '+ response.Year +'</p>' +
+													'<p><b>Genre</b>: '+ response.Genre +'</p>' +
+													'<p><b>Director</b>: '+ response.Director +'</p>' +
+													'<p><b>Actors</b>: '+ response.Actors +'</p>' +
+													'<p><b>Plot</b>: '+ response.Plot +'</p></div>')
 					}else{ max++; }
 				},
 				error: function(result, status, error){
@@ -322,7 +326,41 @@ $(document).ready(function(){
 		
 	}
 	
-	$("#lodPanel").on('mouseenter','.film', function(e) {
+	function getFilmsInfoLK(list, done){
+		var count = 0;
+		var max = 5;
+		while(count<max){
+			$.ajax({
+				type: "GET",
+				url: "http://www.omdbapi.com/?i=tt"+ list[count] +"&apikey="+config.OMDB_API_KEY,
+				success: function(response){
+					if(response.Response == 'True'){
+						$('#film-panel-lk').append('<div class="film" data-tooltip=#'+ response.imdbID +'>' +
+														'<div class="poster" data-tooltip=#'+ response.imdbID +'>' +
+														'<a href="https:\/\/www.imdb.com\/title\/'+ response.imdbID +'" target="_blank">'+
+														'<img src='+ response.Poster +' style="width:150px; height:auto"></a>' +
+														'</div>' +
+														'<p>'+ response.Title +'</p>' +																												
+														'</div>');
+						$('#film-panel-lk').append('<div class="over-popup" id='+ response.imdbID +'>'+
+													'<p><b>Title</b>: '+ response.Title +'</p>'+
+													'<p><b>Year</b>: '+ response.Year +'</p>' +
+													'<p><b>Genre</b>: '+ response.Genre +'</p>' +
+													'<p><b>Director</b>: '+ response.Director +'</p>' +
+													'<p><b>Actors</b>: '+ response.Actors +'</p>' +
+													'<p><b>Plot</b>: '+ response.Plot +'</p></div>')
+					}else{ max++; }
+				},
+				error: function(result, status, error){
+					alert("Sorry, an error occurred retrieving film information. Please try again later");
+				}
+			})  
+			count++;
+		}	 
+		
+	}
+		
+	$("#film-panel").on('mouseenter','.film', function(e) {
 	    $($(this).data("tooltip")).css({
 	        left: e.pageX + 1,
 	        top: e.pageY + 1

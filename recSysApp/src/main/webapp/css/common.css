@@ -1,0 +1,17 @@
+#loading-img{
+	display: none;
+	max-width: 30px; 
+    max-height: 30px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.container {
+	min-width: 100%; 
+	min-height: 100%; 
+    left: 0em; 
+    right: 0em; 
+	position: absolute;
+	background-image: url("../img/bgfilm.jpg");
+	background-repeat: repeat;	
+}

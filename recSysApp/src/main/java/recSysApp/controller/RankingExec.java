@@ -9,8 +9,11 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import facade.FacadeLensKit;
+import facade.FacadeLensKitImpl;
 import model.FacebookPage;
 import model.Film;
+import model.User;
 
 public class RankingExec {
 
@@ -19,7 +22,7 @@ public class RankingExec {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public List<Film> rankFilms(List<Film> filmInputList, List<FacebookPage> facebookPageInputList){
+	public List<Film> rankFilmsByVect(List<Film> filmInputList, List<FacebookPage> facebookPageInputList){
 		
 		List<Film> resultList = new ArrayList<Film>();
 		
@@ -64,4 +67,11 @@ public class RankingExec {
 	    }   
 	    return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
 	}
+
+	public List<String> rankFilmByLenskit(List<Film> filmInputList, User user, int n){
+		FacadeLensKit facadeLensKit = new FacadeLensKitImpl();
+		return facadeLensKit.getRecommendations(Long.parseLong(user.getId()), n, filmInputList);
+		
+	}
+	
 }

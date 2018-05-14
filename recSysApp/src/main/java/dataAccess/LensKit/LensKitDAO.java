@@ -12,6 +12,18 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import org.lenskit.LenskitConfiguration;
+import org.lenskit.LenskitRecommender;
+import org.lenskit.LenskitRecommenderEngine;
+import org.lenskit.api.ItemRecommender;
+import org.lenskit.api.ItemScorer;
+import org.lenskit.api.RecommenderBuildException;
+import org.lenskit.api.Result;
+import org.lenskit.api.ResultList;
+import org.lenskit.baseline.BaselineScorer;
+import org.lenskit.baseline.ItemMeanRatingItemScorer;
+import org.lenskit.baseline.UserMeanBaseline;
+import org.lenskit.baseline.UserMeanItemScorer;
 import org.lenskit.data.dao.DataAccessObject;
 import org.lenskit.data.dao.file.StaticDataSource;
 import org.lenskit.data.entities.CommonAttributes;
@@ -19,6 +31,9 @@ import org.lenskit.data.entities.Entity;
 import org.lenskit.data.entities.EntityType;
 import org.lenskit.data.entities.TypedName;
 import org.lenskit.data.ratings.Rating;
+import org.lenskit.knn.item.ItemItemScorer;
+import org.lenskit.transform.normalize.BaselineSubtractingUserVectorNormalizer;
+import org.lenskit.transform.normalize.UserVectorNormalizer;
 import org.lenskit.util.io.ObjectStream;
 
 import com.google.common.base.Throwables;
@@ -29,6 +44,7 @@ public class LensKitDAO implements LensKitRepository {
 	
 	private DataAccessObject dao;
 
+	@SuppressWarnings("deprecation")
 	public void loadData() {
 			
 			File file = new File(getClass().getClassLoader().getResource("movielens.yml").getFile());
@@ -45,8 +61,6 @@ public class LensKitDAO implements LensKitRepository {
 		}
 	
 	public void saveRating(Long userId, String imdbId, double rating, Long timestamp){
-
-		loadData();
 	    
         long movieId = -1;
 		List<Entity> movieData = this.dao.query(EntityType.forName("item-ids")).withAttribute(TypedName.create("imdbid", String.class), imdbId).get();
@@ -54,9 +68,56 @@ public class LensKitDAO implements LensKitRepository {
         	movieId = (long) movieData.get(0).maybeGet("id");
         }
 		
-		File csvFile = new File(getClass().getClassLoader().getResource("ratingsTest.csv").getFile());
+		File csvFile = new File(getClass().getClassLoader().getResource("ratings.csv").getFile());
 		Path csvDataFile = Paths.get(csvFile.getPath());
 		CsvFileWriter.writeCsvFile(csvDataFile.toString(), userId + "," + movieId + "," + rating + "," + timestamp);
+	}
+	
+	public List<String> getRecommendations(long userId, int n, List<String> imdbIdList) {
+		List<String> recommendationList = new ArrayList<String>();
+        Map<String, Double> mapFilmScore = new LinkedHashMap<String, Double>(); 
+		
+		LenskitConfiguration config = new LenskitConfiguration();
+		// Use item-item CF to score items
+		config.bind(ItemScorer.class).to(ItemItemScorer.class);
+		// let's use personalized mean rating as the baseline/fallback predictor.
+		// 2-step process:
+		// First, use the user mean rating as the baseline scorer
+		config.bind(BaselineScorer.class, ItemScorer.class)
+		      .to(UserMeanItemScorer.class);
+		// Second, use the item mean rating as the base for user means
+		config.bind(UserMeanBaseline.class, ItemScorer.class)
+		      .to(ItemMeanRatingItemScorer.class);
+		// and normalize ratings by baseline prior to computing similarities
+		config.bind(UserVectorNormalizer.class)
+		      .to(BaselineSubtractingUserVectorNormalizer.class);
+		
+		LenskitRecommenderEngine engine = LenskitRecommenderEngine.build(config, this.dao);
+        try (LenskitRecommender rec = engine.createRecommender(this.dao)) {
+        	
+    		Map<Long, String> temp = new HashMap<Long, String>();
+        	for(String imdbid : imdbIdList) {
+    	        List<Entity> movieData = this.dao.query(EntityType.forName("item-ids")).withAttribute(TypedName.create("imdbid", String.class), imdbid).get();
+    	        if(!movieData.isEmpty()) {
+    	        	long id = (long) movieData.get(0).maybeGet("id");
+    	        	temp.put(id, imdbid);
+    	        }
+    		}	
+        	
+        	ItemRecommender irec = rec.getItemRecommender();
+        	assert irec != null; // not null because we configured one
+        	ResultList recs = irec.recommendWithDetails(userId, n, temp.keySet(), null);
+        	//System.out.format("Recommendations for %d:\n", userId);
+            for (Result item : recs) {   
+                mapFilmScore.put(temp.get(item.getId()), item.getScore());
+                //System.out.format("\t%s -----> %.2f\n", temp.get(item.getId()), item.getScore());
+            }
+		} catch (RecommenderBuildException e) {
+			e.printStackTrace();
+		}
+        
+		recommendationList.addAll(mapFilmScore.keySet());
+		return recommendationList;
         
 	}
 	
@@ -193,6 +254,18 @@ public class LensKitDAO implements LensKitRepository {
 		double popularity = dao.query(Rating.class).withAttribute(CommonAttributes.ITEM_ID, id).count();
 		System.out.println(popularity == numberOfUsers);
 		return - entropy;
+	}
+	
+		public void getRatingsTest(long userId) {
+		loadData();
+		List<Rating> ratings = this.dao.query(Rating.class).withAttribute(CommonAttributes.USER_ID, userId).get();
+		if(ratings.isEmpty()) {
+			System.out.println("EMPTY");
+			}else {
+			for(Rating r : ratings) {
+				System.out.println(r.getItemId() + " --- " + r.getValue());
+			}
+		}
 	}
 	*/
 	

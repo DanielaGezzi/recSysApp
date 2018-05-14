@@ -45,11 +45,11 @@ public class FacadeUserImpl implements FacadeUser {
 		}
 	}
 	
-	public List<FacebookPage> getUserLikes(com.restfb.types.User facebookUser){
+	public List<FacebookPage> getUserLikes(String fbUserId){
 		List<FacebookPage> userLikes = new ArrayList<FacebookPage>();
 		
 		UserRepository userRepo = new UserGraphDB();
-		userLikes = userRepo.getUserLikes(facebookUser.getId());
+		userLikes = userRepo.getUserLikes(fbUserId);
 		
 		FastText fastText = FastText.getFastText();
 		for(FacebookPage fbPage: userLikes) {

@@ -72,7 +72,6 @@ public class UserGraphDB implements UserRepository {
 				
 				for (;resultSet.hasNext();) {
 				      BindingSet soln = resultSet.next();
-				      System.out.println(soln);
 				      String id = soln.getValue("user_id").stringValue();
 				      user.setId(id);
 			    }
