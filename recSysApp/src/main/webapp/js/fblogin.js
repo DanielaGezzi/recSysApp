@@ -50,9 +50,10 @@ function getFbUserData(userAccessToken){
 // Logout from facebook
 function fbLogout() {
     FB.logout(function(response) {
-		document.getElementById('btn-fb-login').style.display = "block";
         alert('You have successfully logout from Facebook.');
         window.location.replace("/recSysApp/");
+		document.getElementById('btn-fb-login').style.display = "block";
+
     });
 }
 

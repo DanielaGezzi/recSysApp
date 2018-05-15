@@ -19,6 +19,17 @@
 	flex-grow: 1;
 	background-color: #FFFFFF;
 	display: block;
+	max-width: 300 px;
+	
+}
+
+.poster {
+	min-height: 230px;
+	max-height: 230px;
+	max-width: 150px;
+	min-width: 150px;
+	margin:auto;
+	
 }
 
 #loading-panel{

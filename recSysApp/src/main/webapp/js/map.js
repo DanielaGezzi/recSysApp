@@ -360,11 +360,10 @@ $(document).ready(function(){
 		
 	}
 		
-	$("#film-panel").on('mouseenter','.film', function(e) {
-    	console.log(e.pageX +'---'+ e.pageY);
+	$("#film-panel").on('mouseenter','.poster', function(e) {
 	    $($(this).data("tooltip")).css({        
-	    	left: e.pageX + 1,
-	        top: e.pageY + 1
+	    	left: e.pageX - $('#film-panel').offset().left +1,
+	        top: e.pageY - $('#film-panel').offset().top  +1
 	    }).stop().show(100);
 	})
 	.on('mouseleave','.film',function() {
