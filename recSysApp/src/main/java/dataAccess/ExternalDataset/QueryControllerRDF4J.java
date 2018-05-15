@@ -145,7 +145,7 @@ public class QueryControllerRDF4J implements QueryController {
 		for (;resultSet.hasNext();) {
 		      BindingSet soln = resultSet.next();
 		      System.out.println(soln);
-		      String imdbID = RegexHelper.getRegexString("tt[0-9]+", soln.getValue("imdbID").stringValue()).get(0); //imdbID	
+		      String imdbID = RegexHelper.getRegexString("[a-z]{2}[0-9]+", soln.getValue("imdbID").stringValue()).get(0); //imdbID	
 		      //String imdbID = soln.getValue("imdbID").stringValue();
 		      if (!filmMap.containsKey(imdbID)) {
 			      String filmTitle = soln.getValue("filmLabel").stringValue(); //Title

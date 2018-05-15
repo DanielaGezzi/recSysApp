@@ -24,7 +24,7 @@ public class UserGraphDB implements UserRepository {
 	private Repository repository;
 	
 	public UserGraphDB() {
-		repository = new HTTPRepository("http://localhost:7200/","Test");
+		repository = new HTTPRepository("http://localhost:7200/","recsysapp");
 		repository.initialize();
 	}
 	
@@ -33,8 +33,8 @@ public class UserGraphDB implements UserRepository {
 
 		ModelBuilder builder = new ModelBuilder();
 		Model model = builder
-		                  .setNamespace("db", "http://test/resource/")
-		                  .setNamespace("user","http://test/resource/user/")
+		                  .setNamespace("db", "http://recsysapp/resource/")
+		                  .setNamespace("user","http://recsysapp/resource/user/")
 				  .subject("user:" + user.getFacebookID())
 				       .add(RDF.TYPE, "db:user")
 				       .add("user:userId", user.getId())
@@ -51,8 +51,8 @@ public class UserGraphDB implements UserRepository {
 	public User getUser(String userFbId) {
 		User user = new User();
 		user.setFacebookID(userFbId);
-		String query = "PREFIX db: <http://test/resource/>" + 
-					   "PREFIX user: <http://test/resource/user/>" + 
+		String query = "PREFIX db: <http://recsysapp/resource/>" + 
+					   "PREFIX user: <http://recsysapp/resource/user/>" + 
 					   "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>" + 
 					   "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>" + 
 					   "SELECT ?user ?user_id ?label" +
@@ -89,8 +89,8 @@ public class UserGraphDB implements UserRepository {
 		
 		ModelBuilder builder = new ModelBuilder();
 		Model model = builder
-		                  .setNamespace("fbpage", "http://test/resource/fbpage/")
-		                  .setNamespace("user","http://test/resource/user/")
+		                  .setNamespace("fbpage", "http://recsysapp/resource/fbpage/")
+		                  .setNamespace("user","http://recsysapp/resource/user/")
 				  .subject("user:" + userFbID)
 				       .add("user:likes_fbpage", "fbpage:"+facebookPageID)
 				  .build();
@@ -101,9 +101,9 @@ public class UserGraphDB implements UserRepository {
 	
 	public List<FacebookPage> getUserLikes(String userFbID){
 		List<FacebookPage> userLikes = new ArrayList<FacebookPage>();
-		String query = 	"PREFIX db: <http://test/resource/>" + 
-						"PREFIX user: <http://test/resource/user/>" + 
-						"PREFIX fbpage: <http://test/resource/fbpage/>" + 
+		String query = 	"PREFIX db: <http://recsysapp/resource/>" + 
+						"PREFIX user: <http://recsysapp/resource/user/>" + 
+						"PREFIX fbpage: <http://recsysapp/resource/fbpage/>" + 
 						"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>" + 
 						"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>" + 
 						"SELECT ?user ?fbPage ?fbPage_id ?fbPage_label ?fbPage_cat " +

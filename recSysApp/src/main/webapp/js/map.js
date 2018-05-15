@@ -361,8 +361,9 @@ $(document).ready(function(){
 	}
 		
 	$("#film-panel").on('mouseenter','.film', function(e) {
-	    $($(this).data("tooltip")).css({
-	        left: e.pageX + 1,
+    	console.log(e.pageX +'---'+ e.pageY);
+	    $($(this).data("tooltip")).css({        
+	    	left: e.pageX + 1,
 	        top: e.pageY + 1
 	    }).stop().show(100);
 	})

@@ -23,7 +23,7 @@ public class FacebookPageGraphDB implements FacebookPageRepository {
 	private Repository repository;
 	
 	public FacebookPageGraphDB() {
-		repository = new HTTPRepository("http://localhost:7200/","Test");
+		repository = new HTTPRepository("http://localhost:7200/","recsysapp");
 		repository.initialize();
 	}
 
@@ -32,9 +32,9 @@ public class FacebookPageGraphDB implements FacebookPageRepository {
 		
 		ModelBuilder builder = new ModelBuilder();
 		Model model = builder
-		                .setNamespace("db", "http://test/resource/")
-		                .setNamespace("fbpage","http://test/resource/fbpage/")
-		                .setNamespace("fbcategory","http://test/resource/fbcategory/")
+		                .setNamespace("db", "http://recsysapp/resource/")
+		                .setNamespace("fbpage","http://recsysapp/resource/fbpage/")
+		                .setNamespace("fbcategory","http://recsysapp/resource/fbcategory/")
 				  .subject("fbcategory:"+ fbPage.getCategory())
 			  			.add(RDF.TYPE, "db:fbcategory" )
 			  			.add(RDFS.LABEL, fbPage.getCategory())
@@ -52,9 +52,9 @@ public class FacebookPageGraphDB implements FacebookPageRepository {
 	
 	public List<FacebookPage> getFacebookPageByUser(String userID){
 		List<FacebookPage> userLikes = new ArrayList<FacebookPage>();
-		String query = 	"PREFIX db: <http://test/resource/>" + 
-				"PREFIX user: <http://test/resource/user/>" + 
-				"PREFIX fbpage: <http://test/resource/fbpage/>" + 
+		String query = 	"PREFIX db: <http://recsysapp/resource/>" + 
+				"PREFIX user: <http://recsysapp/resource/user/>" + 
+				"PREFIX fbpage: <http://recsysapp/resource/fbpage/>" + 
 				"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>" + 
 				"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>" + 
 				"SELECT ?user ?fbPage ?fbPage_id ?fbPage_label ?fbPage_cat " +
