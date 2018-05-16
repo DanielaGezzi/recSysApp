@@ -252,6 +252,8 @@ $(document).ready(function(){
 	  }
 	});
 	
+	
+
 	function searchFilms(){
 		$.LoadingOverlay("show");
 	    // Check whether the user already logged in
@@ -275,6 +277,7 @@ $(document).ready(function(){
 						document.getElementById('film-panel').style.display = "flex";
 						getFilmsInfoW2V(response.w2v, function(){});
 						getFilmsInfoLK(response.lk, function(){});
+						document.getElementById('btn-save').style.display = "block";
 						$.LoadingOverlay("hide");
 					},
 					error: function(result, status, error){
@@ -299,12 +302,14 @@ $(document).ready(function(){
 
 	};
 	
-	
+
+	var w2v_map =  new Object();
 	function getFilmsInfoW2V(films, done){
 		$('#film-panel-w2v').empty();
 		var count = 0;
 		var max = 5;
 		while(count<max){
+			w2v_map[films[count].imdbId.substring(2)] = 0;
 			$.ajax({
 				type: "GET",
 				url: "http://www.omdbapi.com/?i="+ films[count].imdbId +"&apikey="+config.OMDB_API_KEY,
@@ -315,7 +320,15 @@ $(document).ready(function(){
 														'<a href="https:\/\/www.imdb.com\/title\/'+ response.imdbID +'" target="_blank">'+
 														'<img class="poster" src='+ response.Poster +'></a>' +
 														'</div>' +
-														'<p>'+ response.Title +'</p>' +														
+														'<p>'+ response.Title +'</p>' +	
+													   	'<select id="w2v-score" data-tooltip=#'+ response.imdbID +'>' +
+													   	'<option value="" selected disabled hidden>*</option>' +
+													   	'<option value="1">1</option>' +
+													   	'<option value="2">2</option>' +
+													   	'<option value="3">3</option>' +
+													   	'<option value="4">4</option>' +
+													   	'<option value="5">5</option>' +
+													   	'</select>' +														
 														'</div>');
 						$('#film-panel-w2v').append('<div class="over-popup" id='+ response.imdbID +'>'+
 													'<p><b>Title</b>: '+ response.Title +'</p>'+
@@ -336,12 +349,13 @@ $(document).ready(function(){
 		}	 
 		
 	}
-	
+	var lk_map = new Object();
 	function getFilmsInfoLK(list, done){
 		$('#film-panel-lk').empty();		
 		var count = 0;
 		var max = 5;
 		while(count<max){
+			lk_map[list[count]] =  0;
 			$.ajax({
 				type: "GET",
 				url: "http://www.omdbapi.com/?i=tt"+ list[count] +"&apikey="+config.OMDB_API_KEY,
@@ -352,7 +366,15 @@ $(document).ready(function(){
 														'<a href="https:\/\/www.imdb.com\/title\/'+ response.imdbID +'" target="_blank">'+
 														'<img class="poster" src='+ response.Poster +' ></a>' +
 														'</div>' +
-														'<p>'+ response.Title +'</p>' +																												
+														'<p>'+ response.Title +'</p>' +
+													   	'<select id="lk-score" data-tooltip=#'+ response.imdbID +'>' +
+													   	'<option value="" selected disabled hidden>*</option>' +
+													   	'<option value="1">1</option>' +
+													   	'<option value="2">2</option>' +
+													   	'<option value="3">3</option>' +
+													   	'<option value="4">4</option>' +
+													   	'<option value="5">5</option>' +
+													   	'</select>' +														
 														'</div>');
 						$('#film-panel-lk').append('<div class="over-popup" id='+ response.imdbID +'>'+
 													'<p><b>Title</b>: '+ response.Title +'</p>'+
@@ -413,7 +435,43 @@ $(document).ready(function(){
 	.on('mouseleave','.poster',function() {
 	    $($(this).data("tooltip")).hide();
 	        
+	})
+	.on('change','#w2v-score', function () {
+	    var optionSelected = $("option:selected", this);
+	    var valueSelected = parseInt(optionSelected.val());
+	    var imdbid = $(this).data("tooltip").substring(3);
+	    w2v_map[imdbid] = valueSelected;
+
+	})
+	.on('change','#lk-score', function () {
+	    var optionSelected = $("option:selected", this);
+	    var valueSelected = parseInt(optionSelected.val());
+	    var imdbid = $(this).data("tooltip").substring(3);
+	    lk_map[imdbid] = valueSelected;
 	});
+	
+	$("#btn-save").on('click', function(){
+		FB.getLoginStatus(function(response) {       	
+        	var json = {
+	        			accessToken : response.authResponse.accessToken,
+	        			w2v : w2v_map,
+	    				lk : lk_map
+    					};
+        	$.ajax({
+				type: "POST",
+				url: "/recSysApp/rest/services/interview",
+				contentType: "application/json",
+				data: JSON.stringify(json),
+				success: function(response){
+					alert('Ratings saved! Select a new POI on the map to continue.')
+				},
+				error: function(result, status, error){
+					alert("Sorry, an error occurred. Please try again later");
+				}
+				
+			})
+		})
+	})
 	
 		
 }); //end of document ready

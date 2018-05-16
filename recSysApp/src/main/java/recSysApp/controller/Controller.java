@@ -4,6 +4,7 @@ package recSysApp.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -25,15 +26,11 @@ import facade.FacadeUserImpl;
 import model.FacebookPage;
 import model.Film;
 import model.Location;
+import utils.InterviewFileWriter;
 
 
 @Path("/services")
 public class Controller {
-
-	// sarebbe opportuno avere un client REST che stora le informazioni utente
-	// e che per ogni richiesta al server REST invia sempre le info di autenticazione
-	// in modo da essere autenticato ad ogni richiesta.
-	// In questo modo viene preservata la condizione stateless come richiesto dal paradigma REST
 
 	@POST
 	@Path("/facebook/user")	
@@ -110,6 +107,30 @@ public class Controller {
 		model.User user = facadeUser.getUser(facebookUser);
 		FacadeLensKit facadeLensKit = new FacadeLensKitImpl();
 		facadeLensKit.saveRatings(Long.parseLong(user.getId()), ratings);
+		return Response.status(200).build();
+	}
+	
+	@POST
+	@Path("/interview")	
+    @Consumes(MediaType.APPLICATION_JSON)
+	public Response saveInterview(String requestPayload) {
+		
+		Gson gson = new Gson();
+		@SuppressWarnings("unchecked")
+		Map<String, Object> map = gson.fromJson(requestPayload, Map.class);
+		System.out.println(map);
+		@SuppressWarnings("unchecked")
+		Map<String, Double> w2v = (Map<String,Double>) map.get("w2v");
+		@SuppressWarnings("unchecked")
+		Map<String,Double> lk = (Map<String,Double>) map.get("lk");
+		System.out.println(w2v);
+		System.out.println(lk);
+    	String accessToken = (String) map.get("accessToken");
+		FacebookExec fbExecutioner = new FacebookExec(accessToken);
+		User facebookUser = fbExecutioner.getFacebookUserInfo();
+		FacadeUser facadeUser = new FacadeUserImpl();
+		model.User user = facadeUser.getUser(facebookUser);
+		InterviewFileWriter.write(user, w2v, lk);
 		return Response.status(200).build();
 	}
 	

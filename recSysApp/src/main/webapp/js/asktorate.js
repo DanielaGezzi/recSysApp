@@ -2,7 +2,7 @@ $(document).ready(function(){
 	document.getElementById('loading-img').style.display = "block";
 	$.ajax({
 		type: "GET",
-		url: "/recSysApp/rest/services/film/askToRate/10",
+		url: "/recSysApp/rest/services/film/askToRate/30",
 		success: function(response){
 			document.getElementById('loading-panel').style.display = "none";
 			var count = 0;
@@ -95,7 +95,7 @@ $(document).ready(function(){
 	    var valueSelected = optionSelected.val();
 	    var imdbid = $(this).data("tooltip").substring(3);
 	    ratings[imdbid] = valueSelected;
-	    if(Object.keys(ratings).length==10){
+	    if(Object.keys(ratings).length >= 10){
 	    	document.getElementById('btn-continue').style.display = "block";
 	    }else{
 	    	document.getElementById('btn-continue').style.display = "none";
@@ -117,15 +117,17 @@ $(document).ready(function(){
 	        			accessToken : response.authResponse.accessToken,
 	    				ratings : ratings
 	    				};
-	        	console.log(json);
 	        	$.ajax({
 					type: "POST",
 					url: "/recSysApp/rest/services/film/newRatings",
 					contentType: "application/json",
 					data: JSON.stringify(json),
 					success: function(response){
-						$.LoadingOverlay("hide");
-						window.location.replace("/recSysApp/map.html");
+						setTimeout(function(){
+							$.LoadingOverlay("hide");
+							window.location.replace("/recSysApp/map.html");
+						}, 20000);
+						
 					},
 					error: function(result, status, error){
 						alert("Sorry, an error occurred. Please try again later");
