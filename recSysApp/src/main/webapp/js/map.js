@@ -313,7 +313,7 @@ $(document).ready(function(){
 						$('#film-panel-w2v').append('<div class="film" data-tooltip=#'+ response.imdbID +'>' +
 														'<div class="poster" data-tooltip=#'+ response.imdbID +'>' +
 														'<a href="https:\/\/www.imdb.com\/title\/'+ response.imdbID +'" target="_blank">'+
-														'<img src='+ response.Poster +' style="width:150px; height:auto"></a>' +
+														'<img class="poster" src='+ response.Poster +'></a>' +
 														'</div>' +
 														'<p>'+ response.Title +'</p>' +														
 														'</div>');
@@ -350,7 +350,7 @@ $(document).ready(function(){
 						$('#film-panel-lk').append('<div class="film" data-tooltip=#'+ response.imdbID +'>' +
 														'<div class="poster" data-tooltip=#'+ response.imdbID +'>' +
 														'<a href="https:\/\/www.imdb.com\/title\/'+ response.imdbID +'" target="_blank">'+
-														'<img src='+ response.Poster +' style="width:150px; height:auto"></a>' +
+														'<img class="poster" src='+ response.Poster +' ></a>' +
 														'</div>' +
 														'<p>'+ response.Title +'</p>' +																												
 														'</div>');
@@ -384,8 +384,8 @@ $(document).ready(function(){
 		
 	    if(x >(_outerWidth - _width)){
 	        x = _outerWidth - _width;}
-	    if(y >(_outerHeight - _height)){
-	        y = _outerHeight - _height;}
+	    //if(y >(_outerHeight - _height)){
+	      //  y = _outerHeight - _height;}
 	    
 	    $($(this).data("tooltip")).css({
 	        left: x - $('#film-panel').offset().left + 1,
@@ -402,8 +402,8 @@ $(document).ready(function(){
 	
 		if(x >(_outerWidth - _width)){
 			x = _outerWidth -  _width;}
-		if(y >(_outerHeight - _height)){
-			y = _outerHeight - _height;}
+		//if(y >(_outerHeight - _height)){
+			//y = _outerHeight - _height;}
     
 		$($(this).data("tooltip")).css({
 			left: x - $('#film-panel').offset().left +1,

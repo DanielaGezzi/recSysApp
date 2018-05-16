@@ -32,6 +32,7 @@
     padding: 20px 15px 20px 15px;
     text-align: center;
     display: none;
+    align-items:flex-start;
 	
 }
 
@@ -51,7 +52,8 @@
 	flex-grow: 1;
 	background-color: #FFFFFF;
 	display: block;
-	max-width: 300 px;
+	max-width: 300px;
+	vertical-align: top;
 }
 
 .poster {
@@ -61,6 +63,12 @@
 	min-width: 150px;
 	margin:auto;
 	
+}
+
+img.poster {
+	width:150px; 
+	height:auto;
+	max-height:230px;
 }
 
 

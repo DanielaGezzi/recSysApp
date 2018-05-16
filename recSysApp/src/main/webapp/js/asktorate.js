@@ -60,8 +60,8 @@ $(document).ready(function(){
 		
 	    if(x >(_outerWidth - _width)){
 	        x = _outerWidth - _width;}
-	    if(y >(_outerHeight - _height)){
-	        y = _outerHeight - _height;}
+	    //if(y >(_outerHeight - _height)){
+	      //  y = _outerHeight - _height;}
 	    
 	    $($(this).data("tooltip")).css({
 	        left: x - $('#film-panel').offset().left +1,
@@ -78,8 +78,8 @@ $(document).ready(function(){
 	
 		if(x >(_outerWidth - _width)){
 			x = _outerWidth - _width;}
-		if(y >(_outerHeight - _height)){
-			y = _outerHeight - _height;}
+		//if(y >(_outerHeight - _height)){
+			//y = _outerHeight - _height;}
     
 		$($(this).data("tooltip")).css({
 			left: x - $('#film-panel').offset().left +1,
