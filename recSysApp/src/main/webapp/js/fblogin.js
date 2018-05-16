@@ -15,7 +15,8 @@ function fbLogin() {
             // Get the user profile data
             getFbUserData(response.authResponse.accessToken);            
         } else {        	
-            document.getElementById('status').innerHTML = 'User cancelled login or did not fully authorize.';
+            alert('User cancelled login or did not fully authorize.');
+            window.location.replace("/recSysApp/");
         }       
     },{scope: 'public_profile,user_likes'});    
 }
@@ -41,6 +42,7 @@ function getFbUserData(userAccessToken){
 			},
 			error: function(result, status, error){
 				alert("Sorry, an error occurred. Please try again later");
+				window.location.replace("/recSysApp/");
 			}
 		})
         //console.log(response);

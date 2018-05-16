@@ -73,6 +73,7 @@
     padding: 15px;
     min-width: 280px;
     max-width: 480px;
+    height: auto;
     text-align: left;
 }
 

@@ -285,7 +285,15 @@ $(document).ready(function(){
 	        }
 	        else{
 	        	//login
-	        	fbLogin();
+	        	FB.login(function (response) {    	
+	                if (response.status == 'connected') {
+	                	window.location.replace("/recSysApp/map.html");
+	                } else {        	
+	                    alert('User cancelled login or did not fully authorize.');
+	                    window.location.replace("/recSysApp/");
+	                }       
+	            },{scope: 'public_profile,user_likes'});  
+	        	
 	        }
 	    });
 
@@ -293,6 +301,7 @@ $(document).ready(function(){
 	
 	
 	function getFilmsInfoW2V(films, done){
+		$('#film-panel-w2v').empty();
 		var count = 0;
 		var max = 5;
 		while(count<max){
@@ -319,6 +328,8 @@ $(document).ready(function(){
 				},
 				error: function(result, status, error){
 					alert("Sorry, an error occurred retrieving film information. Please try again later");
+					$.LoadingOverlay("hide");
+
 				}
 			})  
 			count++;
@@ -327,6 +338,7 @@ $(document).ready(function(){
 	}
 	
 	function getFilmsInfoLK(list, done){
+		$('#film-panel-lk').empty();		
 		var count = 0;
 		var max = 5;
 		while(count<max){
@@ -353,6 +365,8 @@ $(document).ready(function(){
 				},
 				error: function(result, status, error){
 					alert("Sorry, an error occurred retrieving film information. Please try again later");
+					$.LoadingOverlay("hide");
+
 				}
 			})  
 			count++;
@@ -361,13 +375,44 @@ $(document).ready(function(){
 	}
 		
 	$("#film-panel").on('mouseenter','.poster', function(e) {
-	    $($(this).data("tooltip")).css({        
-	    	left: e.pageX - $('#film-panel').offset().left +1,
-	        top: e.pageY - $('#film-panel').offset().top  +1
+		var _width = $($(this).data("tooltip")).outerWidth() + 100,
+		    _height = $($(this).data("tooltip")).outerHeight()+ 100;
+		var _outerWidth = document.getElementById('container').offsetWidth,
+		    _outerHeight = document.getElementById('container').offsetHeight;
+		var x = e.pageX,
+			y = e.pageY;
+		
+	    if(x >(_outerWidth - _width)){
+	        x = _outerWidth - _width;}
+	    if(y >(_outerHeight - _height)){
+	        y = _outerHeight - _height;}
+	    
+	    $($(this).data("tooltip")).css({
+	        left: x - $('#film-panel').offset().left + 1,
+	        top: y - $('#film-panel').offset().top + 1
 	    }).stop().show(100);
 	})
-	.on('mouseleave','.film',function() {
+	.on('mousemove', '.poster', function(e){
+		var _width = $($(this).data("tooltip")).outerWidth(),
+	    	_height = $($(this).data("tooltip")).outerHeight();
+		var _outerWidth = document.getElementById('container').offsetWidth,
+		_outerHeight = document.getElementById('container').offsetHeight;
+		var x = e.pageX,
+			y = e.pageY;
+	
+		if(x >(_outerWidth - _width)){
+			x = _outerWidth -  _width;}
+		if(y >(_outerHeight - _height)){
+			y = _outerHeight - _height;}
+    
+		$($(this).data("tooltip")).css({
+			left: x - $('#film-panel').offset().left +1,
+			top: y - $('#film-panel').offset().top +1
+		}).stop().show(100);
+	})
+	.on('mouseleave','.poster',function() {
 	    $($(this).data("tooltip")).hide();
+	        
 	});
 	
 		

@@ -51,10 +51,40 @@ $(document).ready(function(){
 	var ratings =  new Object();
 	
 	$("#film-panel").on('mouseenter','.poster', function(e) {
+		var _width = $($(this).data("tooltip")).outerWidth() + 100,
+		    _height = $($(this).data("tooltip")).outerHeight()+ 100;
+		var _outerWidth = document.getElementById('container').offsetWidth,
+		    _outerHeight = document.getElementById('container').offsetHeight;
+		var x = e.pageX,
+			y = e.pageY;
+		
+	    if(x >(_outerWidth - _width)){
+	        x = _outerWidth - _width;}
+	    if(y >(_outerHeight - _height)){
+	        y = _outerHeight - _height;}
+	    
 	    $($(this).data("tooltip")).css({
-	        left: e.pageX - $('#film-panel').offset().left +1 ,
-	        top: e.pageY - $('#film-panel').offset().top  +1
+	        left: x - $('#film-panel').offset().left +1,
+	        top: y - $('#film-panel').offset().top +1
 	    }).stop().show(100);
+	})
+	.on('mousemove', '.poster', function(e){
+		var _width = $($(this).data("tooltip")).outerWidth() + 100,
+	    	_height = $($(this).data("tooltip")).outerHeight()+ 100;
+		var _outerWidth = document.getElementById('container').offsetWidth,
+		_outerHeight = document.getElementById('container').offsetHeight;
+		var x = e.pageX,
+			y = e.pageY;
+	
+		if(x >(_outerWidth - _width)){
+			x = _outerWidth - _width;}
+		if(y >(_outerHeight - _height)){
+			y = _outerHeight - _height;}
+    
+		$($(this).data("tooltip")).css({
+			left: x - $('#film-panel').offset().left +1,
+			top: y - $('#film-panel').offset().top +1
+		}).stop().show(100);
 	})
 	.on('mouseleave','.poster',function() {
 	    $($(this).data("tooltip")).hide();
@@ -79,6 +109,7 @@ $(document).ready(function(){
 	});
 	
 	$("#btn-continue").on('click', function(){
+		$.LoadingOverlay("show");
 		FB.getLoginStatus(function(response) {
 	        if (response.status === 'connected') {
 	        	
@@ -93,16 +124,45 @@ $(document).ready(function(){
 					contentType: "application/json",
 					data: JSON.stringify(json),
 					success: function(response){
+						$.LoadingOverlay("hide");
 						window.location.replace("/recSysApp/map.html");
 					},
 					error: function(result, status, error){
 						alert("Sorry, an error occurred. Please try again later");
+						$.LoadingOverlay("hide");
 					}
+					
 				})
 	        }
 			else{
 				//login
-				fbLogin();
+	        	FB.login(function (response) {    	
+	                if (response.status == 'connected') {
+	                	var json = {
+	    	        			accessToken : response.authResponse.accessToken,
+	    	    				ratings : ratings
+	    	    				};
+	    	        	console.log(json);
+	    	        	$.ajax({
+	    					type: "POST",
+	    					url: "/recSysApp/rest/services/film/newRatings",
+	    					contentType: "application/json",
+	    					data: JSON.stringify(json),
+	    					success: function(response){
+	    						$.LoadingOverlay("hide");
+	    						window.location.replace("/recSysApp/map.html");
+	    					},
+	    					error: function(result, status, error){
+	    						alert("Sorry, an error occurred. Please try again later");
+	    						$.LoadingOverlay("hide");
+	    					}
+	    					
+	    				})
+	                } else {        	
+	                    alert('User cancelled login or did not fully authorize.');
+	                    window.location.replace("/recSysApp/");
+	                }       
+	            },{scope: 'public_profile,user_likes'});
 			}
 		
 		})
