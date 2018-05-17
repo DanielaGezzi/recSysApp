@@ -4,7 +4,6 @@ package recSysApp.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -26,11 +25,18 @@ import facade.FacadeUserImpl;
 import model.FacebookPage;
 import model.Film;
 import model.Location;
+import utils.FastText;
 import utils.InterviewFileWriter;
 
 
 @Path("/services")
 public class Controller {
+	
+	@POST
+	@Path("/init")
+	public void init() {
+		FastText.getFastText();
+	}
 
 	@POST
 	@Path("/facebook/user")	

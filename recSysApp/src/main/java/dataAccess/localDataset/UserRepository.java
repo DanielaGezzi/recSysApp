@@ -9,10 +9,10 @@ public interface UserRepository {
 	
 	void saveUser(User user);
 	
-	public User getUser(String userFbId);
+	User getUser(String userFbId);
 
 	void saveUserLike(String userID, String facebookID);
 	
-	public List<FacebookPage> getUserLikes(String userID);
+	List<FacebookPage> getUserLikes(String userID);
 
 }

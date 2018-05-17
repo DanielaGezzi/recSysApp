@@ -5,7 +5,6 @@ import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 
 import org.eclipse.rdf4j.query.BindingSet;
@@ -15,7 +14,6 @@ import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.sparql.SPARQLRepository;
 
 import model.Film;
-import model.Location;
 import utils.RegexHelper;
 
 public class QueryControllerRDF4J implements QueryController {

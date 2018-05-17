@@ -8,6 +8,6 @@ public interface FacebookPageRepository {
 	
 	void saveFacebookPage(FacebookPage fbPage);
 	
-	public List<FacebookPage> getFacebookPageByUser(String userID);
+	List<FacebookPage> getFacebookPageByUser(String userID);
 
 }

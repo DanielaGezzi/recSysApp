@@ -16,7 +16,6 @@ import facade.FacadeFacebookPageImpl;
 import facade.FacadeUser;
 import facade.FacadeUserImpl;
 import model.FacebookPage;
-import utils.FastText;
 
 public class FacebookExec {
 	

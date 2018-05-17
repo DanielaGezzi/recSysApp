@@ -3,7 +3,6 @@ package dataAccess.ExternalDataset;
 import java.util.List;
 
 import model.Film;
-import model.Location;
 
 public interface QueryController {
 	

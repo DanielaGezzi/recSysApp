@@ -39,6 +39,7 @@ import org.lenskit.util.io.ObjectStream;
 import com.google.common.base.Throwables;
 
 import utils.CsvFileWriter;
+import utils.LensKitRecommender;
 
 public class LensKitDAO implements LensKitRepository {
 	
@@ -199,9 +200,40 @@ public class LensKitDAO implements LensKitRepository {
 		return this.dao.query(Rating.class).withAttribute(CommonAttributes.ITEM_ID, movieId).count();
 	}
 
+	public List<String> getRecommendationsTest(long userId, int n, List<String> imdbIdList) {
+		List<String> recommendationList = new ArrayList<String>();
+        Map<String, Double> mapFilmScore = new LinkedHashMap<String, Double>(); 
+        
+		LensKitRecommender lkr = LensKitRecommender.getLensKitRecommender();
+        try (LenskitRecommender rec = lkr.getLkr()) {
+        	
+    		Map<Long, String> temp = new HashMap<Long, String>();
+        	for(String imdbid : imdbIdList) {
+    	        List<Entity> movieData = this.dao.query(EntityType.forName("item-ids")).withAttribute(TypedName.create("imdbid", String.class), imdbid).get();
+    	        if(!movieData.isEmpty()) {
+    	        	long id = (long) movieData.get(0).maybeGet("id");
+    	        	temp.put(id, imdbid);
+    	        }
+    		}	
+        	
+        	ItemRecommender irec = rec.getItemRecommender();
+        	assert irec != null; // not null because we configured one
+        	ResultList recs = irec.recommendWithDetails(userId, n, temp.keySet(), null);
+        	//System.out.format("Recommendations for %d:\n", userId);
+            for (Result item : recs) {   
+                mapFilmScore.put(temp.get(item.getId()), item.getScore());
+                //System.out.format("\t%s -----> %.2f\n", temp.get(item.getId()), item.getScore());
+            }
+		} catch (RecommenderBuildException e) {
+			e.printStackTrace();
+		}
+        
+        recommendationList.addAll(mapFilmScore.keySet());
+		return recommendationList;
 	
+	}
 	
-	
+}
 	/*	
 	public double getEntropyZero(Long id, DataAccessObject dao) {
 		double entropy = 0;
@@ -270,4 +302,4 @@ public class LensKitDAO implements LensKitRepository {
 	*/
 	
 
-}
+
