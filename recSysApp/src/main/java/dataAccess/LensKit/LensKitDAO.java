@@ -233,11 +233,12 @@ public class LensKitDAO implements LensKitRepository {
         }
         
 		LensKitRecommender lkr = LensKitRecommender.getLensKitRecommender();
-		//lkr.setLkr(dao);
-        try (LenskitRecommender rec = lkr.getLkr()) {
-        	
-        	
-        	
+        try {        	
+        	LenskitRecommender rec = lkr.getLkr();
+        	if(rec == null ) {
+        		lkr.setLkr(this.dao);
+        		rec = lkr.getLkr();
+        	}
     		Map<Long, String> temp = new HashMap<Long, String>();
         	for(String imdbid : imdbIdList) {
     	        List<Entity> movieData = this.dao.query(EntityType.forName("item-ids")).withAttribute(TypedName.create("imdbid", String.class), imdbid).get();

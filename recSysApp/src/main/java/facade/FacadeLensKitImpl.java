@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.lenskit.data.dao.DataAccessObject;
-
 import dataAccess.LensKit.LensKitDAO;
 import dataAccess.LensKit.LensKitRepository;
 import model.Film;
@@ -18,13 +16,13 @@ public class FacadeLensKitImpl implements FacadeLensKit {
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 		Long timestampMillis = timestamp.getTime();
 		LensKitRepository lkRepo = new LensKitDAO();
-		DataAccessObject dao = lkRepo.loadRemoteData();
+		lkRepo.loadData();
 		for(String imdbId : imdbIdScoreList.keySet()) {
 			double score = Double.parseDouble(imdbIdScoreList.get(imdbId));
 			lkRepo.saveRating(userId, imdbId, score, timestampMillis);
 		}
 		LensKitRecommender lkr = LensKitRecommender.getLensKitRecommender();
-		lkr.setLkr(dao);
+		lkr.setLkr(lkRepo.loadRemoteData());
 	}
 	
 	public List<String> getLogPopularityEntropyFilms() {

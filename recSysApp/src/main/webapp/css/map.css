@@ -39,11 +39,22 @@
 .film-panel-w2v, .film-panel-lk {
 	
 	max-width: 900px;
-	padding: 15px 10px;
+	padding: 15px 5px 15px 10px;
 	flex-grow: 1;
 	background-color: white;
 	display: flex;
 	flex-wrap: wrap;
+	justify-content: flex-end;	
+	
+}
+
+.film-panel-lk {
+	justify-content: flex-start;
+}
+
+
+.film-panel-lk {
+	padding: 15px 10px 15px 5px;
 	
 }
 

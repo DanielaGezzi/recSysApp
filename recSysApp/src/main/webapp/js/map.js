@@ -273,7 +273,9 @@ $(document).ready(function(){
 					},
 					dataType: "json",
 					success: function(response){
-						console.log(response);
+						//console.log(response);
+						lk_map = new Object();
+						w2v_map = new Object();
 						document.getElementById('film-panel').style.display = "flex";
 						getFilmsInfoW2V(response.w2v, function(){});
 						getFilmsInfoLK(response.lk, function(){});
@@ -303,7 +305,7 @@ $(document).ready(function(){
 	};
 	
 
-	var w2v_map =  new Object();
+	var w2v_map;
 	function getFilmsInfoW2V(films, done){
 		$('#film-panel-w2v').empty();
 		var count = 0;
@@ -315,7 +317,7 @@ $(document).ready(function(){
 				url: "http://www.omdbapi.com/?i="+ films[count].imdbId +"&apikey="+config.OMDB_API_KEY,
 				success: function(response){
 					if(response.Response == 'True'){
-						$('#film-panel-w2v').append('<div class="film" data-tooltip=#'+ response.imdbID +'>' +
+						$('#film-panel').append('<div class="film" data-tooltip=#'+ response.imdbID +'>' +
 														'<div class="poster" data-tooltip=#'+ response.imdbID +'>' +
 														'<a href="https:\/\/www.imdb.com\/title\/'+ response.imdbID +'" target="_blank">'+
 														'<img class="poster" src='+ response.Poster +'></a>' +
@@ -330,7 +332,7 @@ $(document).ready(function(){
 													   	'<option value="5">5</option>' +
 													   	'</select>' +														
 														'</div>');
-						$('#film-panel-w2v').append('<div class="over-popup" id='+ response.imdbID +'>'+
+						$('#film-panel').append('<div class="over-popup" id='+ response.imdbID +'>'+
 													'<p><b>Title</b>: '+ response.Title +'</p>'+
 													'<p><b>Year</b>: '+ response.Year +'</p>' +
 													'<p><b>Genre</b>: '+ response.Genre +'</p>' +
@@ -349,7 +351,7 @@ $(document).ready(function(){
 		}	 
 		
 	}
-	var lk_map = new Object();
+	var lk_map;
 	function getFilmsInfoLK(list, done){
 		$('#film-panel-lk').empty();		
 		var count = 0;
@@ -361,7 +363,7 @@ $(document).ready(function(){
 				url: "http://www.omdbapi.com/?i=tt"+ list[count] +"&apikey="+config.OMDB_API_KEY,
 				success: function(response){
 					if(response.Response == 'True'){
-						$('#film-panel-lk').append('<div class="film" data-tooltip=#'+ response.imdbID +'>' +
+						$('#film-panel').append('<div class="film" data-tooltip=#'+ response.imdbID +'>' +
 														'<div class="poster" data-tooltip=#'+ response.imdbID +'>' +
 														'<a href="https:\/\/www.imdb.com\/title\/'+ response.imdbID +'" target="_blank">'+
 														'<img class="poster" src='+ response.Poster +' ></a>' +
@@ -376,7 +378,7 @@ $(document).ready(function(){
 													   	'<option value="5">5</option>' +
 													   	'</select>' +														
 														'</div>');
-						$('#film-panel-lk').append('<div class="over-popup" id='+ response.imdbID +'>'+
+						$('#film-panel').append('<div class="over-popup" id='+ response.imdbID +'>'+
 													'<p><b>Title</b>: '+ response.Title +'</p>'+
 													'<p><b>Year</b>: '+ response.Year +'</p>' +
 													'<p><b>Genre</b>: '+ response.Genre +'</p>' +
@@ -441,6 +443,8 @@ $(document).ready(function(){
 	    var valueSelected = parseInt(optionSelected.val());
 	    var imdbid = $(this).data("tooltip").substring(3);
 	    w2v_map[imdbid] = valueSelected;
+	    console.log(w2v_map);
+
 
 	})
 	.on('change','#lk-score', function () {
@@ -448,6 +452,7 @@ $(document).ready(function(){
 	    var valueSelected = parseInt(optionSelected.val());
 	    var imdbid = $(this).data("tooltip").substring(3);
 	    lk_map[imdbid] = valueSelected;
+	    console.log(lk_map);
 	});
 	
 	$("#btn-save").on('click', function(){
@@ -464,8 +469,7 @@ $(document).ready(function(){
 				data: JSON.stringify(json),
 				success: function(response){
 					alert('Ratings saved! Select a new POI on the map to continue.')
-					lk_map = new Object();
-					w2v_map = new Object();
+					
 				},
 				error: function(result, status, error){
 					alert("Sorry, an error occurred. Please try again later");
