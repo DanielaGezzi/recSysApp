@@ -7,11 +7,12 @@ import com.github.jfasttext.JFastText;
 
 public class FastText {
 	private static FastText instance = null;
-	private JFastText jft = new JFastText();
+	private static JFastText jft = null;
 	    
 		private FastText() {
 			File file = new File(getClass().getClassLoader().getResource("wiki.en.bin").getFile());
-			this.jft.loadModel(file.getAbsolutePath());
+			FastText.jft = new JFastText();
+			FastText.jft.loadModel(file.getAbsolutePath());
 		}
 		
 		public static synchronized FastText getFastText() {

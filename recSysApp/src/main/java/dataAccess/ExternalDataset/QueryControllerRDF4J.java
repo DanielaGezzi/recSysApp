@@ -57,7 +57,7 @@ public class QueryControllerRDF4J implements QueryController {
 									 "    		bd:serviceParam wikibase:center ?loc." + 
 									 "   	 	bd:serviceParam wikibase:radius \"5\"." + 
 									 "   	}" + 
-									 "  		VALUES (?loc) {(\"Point("+ longitude +" "+ latitude +")\"^^geo:wktLiteral)}" + 
+									 "  	VALUES (?loc) {(\"Point("+ longitude +" "+ latitude +")\"^^geo:wktLiteral)}" + 
 									 "   	SERVICE wikibase:label { bd:serviceParam wikibase:language \"en\". }" + 
 									 "   	BIND(geof:distance(?loc, ?locationCoord) AS ?dist)" + 
 									 "} ORDER BY ?dist";

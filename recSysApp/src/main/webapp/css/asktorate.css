@@ -10,7 +10,25 @@
     display: flex;
     flex-wrap: wrap;
     
+    
+    
 }
+
+.films-list {
+	position: relative;
+    max-width: 1800px;
+    width: 100%;
+    background-color: white;
+    border-radius: 10px;
+    text-align: center;
+	display: none;
+	flex-wrap: wrap;
+	
+}
+
+.films-active{
+		display:flex;
+	}
 
 .film {
 	padding: 15px 10px;
@@ -59,4 +77,12 @@ img.poster {
 
 #btn-continue {
 	display: none;
+}
+
+#pagination-container {
+	display: none;
+	position: relative;
+	width: 6%;
+ 	margin: auto;
+	
 }

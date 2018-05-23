@@ -1,5 +1,7 @@
 package utils;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.util.Map;
 
@@ -15,11 +17,16 @@ public class InterviewFileWriter {
 		PrintWriter writer;
 		
 		try {
-			writer = new PrintWriter(user.getId() + ".txt", "UTF-8");
+			File file = new File(user.getId() + ".txt");
+			writer = new PrintWriter(new FileOutputStream(file,true));
+			
+			if(file.length() == 0) {
+			
 			writer.println("FacebookId = "  + user.getFacebookID());
 			writer.println("UserId = " + user.getId());
-			
 			writer.println("--------------------------------------------------------------------------------------------");
+			
+			}
 			
 			double w2vCount = 0;
 			double lkCount = 0;

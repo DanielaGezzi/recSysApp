@@ -23,4 +23,9 @@
   <welcome-file-list>
     <welcome-file>index.html</welcome-file>
   </welcome-file-list>
+  <listener>  
+    <listener-class>
+        recSysApp.controller.ContextListener
+    </listener-class>
+</listener>
 </web-app>

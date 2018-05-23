@@ -2,50 +2,26 @@ $(document).ready(function(){
 	document.getElementById('loading-img').style.display = "block";
 	$.ajax({
 		type: "GET",
-		url: "/recSysApp/rest/services/film/askToRate/30",
+		url: "/recSysApp/rest/services/film/askToRate/54",
 		success: function(response){
 			document.getElementById('loading-panel').style.display = "none";
-			var count = 0;
-			while(count<response.length){
-				$.ajax({
-					type: "GET",
-					url: "http://www.omdbapi.com/?i=tt"+ response[count] +"&apikey="+config.OMDB_API_KEY,
-					success: function(response){
-						if(response.Response == 'True'){
-							$('#film-panel').append('<div class="film" data-tooltip=#'+ response.imdbID +'>' +
-														'<div class="poster" data-tooltip=#'+ response.imdbID +'>' +
-														'<a href="https:\/\/www.imdb.com\/title\/'+ response.imdbID +'" target="_blank">'+
-														'<img src='+ response.Poster +' style="width:150px; height:auto"></a>' +
-														'</div>' +
-														'<p>'+ response.Title +'</p>' +
-													   	'<select id="score" data-tooltip=#'+ response.imdbID +'>' +
-													   	'<option value="" selected disabled hidden>*</option>' +
-													   	'<option value="1">1</option>' +
-													   	'<option value="2">2</option>' +
-													   	'<option value="3">3</option>' +
-													   	'<option value="4">4</option>' +
-													   	'<option value="5">5</option>' +
-													   	'</select>' +
-														'</div>');
-							$('#film-panel').append('<div class="over-popup" id='+ response.imdbID +'>'+
-													'<p><b>Title</b>: '+ response.Title +'</p>'+
-													'<p><b>Year</b>: '+ response.Year +'</p>' +
-													'<p><b>Genre</b>: '+ response.Genre +'</p>' +
-													'<p><b>Director</b>: '+ response.Director +'</p>' +
-													'<p><b>Actors</b>: '+ response.Actors +'</p>' +
-													'<p><b>Plot</b>: '+ response.Plot +'</p></div>')
-						}
-					},
-					error: function(result, status, error){
-						alert("Sorry, an error occurred retrieving film information. Please try again later");
-					}
-				})  
-				count++;
-			}	
+			getFilmFromOmdb(response.slice(0,17), 1);
+			getFilmFromOmdb(response.slice(18,35), 2);
+			getFilmFromOmdb(response.slice(36,53), 3);
+			document.getElementById('pagination-container').style.display = "block";
+
 		},
 		error: function(result, status, error){
 			alert("Sorry, an error occurred. Please try again later");
 		}
+	})
+	
+	$("#pagination li").on('click', function(){
+		var n = $(this).attr('id');
+		$('.active').removeClass('active');
+		$(this).addClass('active');
+		$('.films-active').removeClass('films-active');
+		$('#films' + n ).addClass('films-active');
 	})
 	
 	var ratings =  new Object();
@@ -126,7 +102,7 @@ $(document).ready(function(){
 						setTimeout(function(){
 							$.LoadingOverlay("hide");
 							window.location.replace("/recSysApp/map.html");
-						}, 20000);
+						}, 6000);
 						
 					},
 					error: function(result, status, error){
@@ -171,3 +147,44 @@ $(document).ready(function(){
 	});
 
 });
+
+
+function getFilmFromOmdb(filmList, page){
+	var count = 0;
+	while(count<filmList.length){
+		$.ajax({
+			type: "GET",
+			url: "http://www.omdbapi.com/?i=tt"+ filmList[count] +"&apikey="+config.OMDB_API_KEY,
+			success: function(response){
+				if(response.Response == 'True'){
+					$('#films'+page).append('<div id="film" class="film" data-tooltip=#'+ response.imdbID +'>' +
+												'<div class="poster" data-tooltip=#'+ response.imdbID +'>' +
+												'<a href="https:\/\/www.imdb.com\/title\/'+ response.imdbID +'" target="_blank">'+
+												'<img src='+ response.Poster +' style="width:150px; height:auto"></a>' +
+												'</div>' +
+												'<p>'+ response.Title +'</p>' +
+											   	'<select id="score" data-tooltip=#'+ response.imdbID +'>' +
+											   	'<option value="" selected disabled hidden>*</option>' +
+											   	'<option value="1">1</option>' +
+											   	'<option value="2">2</option>' +
+											   	'<option value="3">3</option>' +
+											   	'<option value="4">4</option>' +
+											   	'<option value="5">5</option>' +
+											   	'</select>' +
+												'</div>');
+					$('#film-panel').append('<div class="over-popup" id='+ response.imdbID +'>'+
+											'<p><b>Title</b>: '+ response.Title +'</p>'+
+											'<p><b>Year</b>: '+ response.Year +'</p>' +
+											'<p><b>Genre</b>: '+ response.Genre +'</p>' +
+											'<p><b>Director</b>: '+ response.Director +'</p>' +
+											'<p><b>Actors</b>: '+ response.Actors +'</p>' +
+											'<p><b>Plot</b>: '+ response.Plot +'</p></div>')
+				}
+			},
+			error: function(result, status, error){
+				alert("Sorry, an error occurred retrieving film information. Please try again later");
+			}
+		})
+		count++;
+	}
+}

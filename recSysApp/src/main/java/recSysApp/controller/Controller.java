@@ -25,18 +25,19 @@ import facade.FacadeUserImpl;
 import model.FacebookPage;
 import model.Film;
 import model.Location;
-import utils.FastText;
 import utils.InterviewFileWriter;
 
 
 @Path("/services")
-public class Controller {
+public class Controller{
 	
-	@POST
+	/*@GET
 	@Path("/init")
-	public void init() {
-		FastText.getFastText();
-	}
+    @Produces(MediaType.TEXT_PLAIN)
+	public String init() {
+		LensKitRecommender.getLensKitRecommender();
+		return "ok";
+	}*/
 
 	@POST
 	@Path("/facebook/user")	
@@ -64,26 +65,28 @@ public class Controller {
 										@QueryParam("city") String city,
 										@QueryParam("state") String state,
 										@QueryParam("country") String country) {
-
+		
+		Map<String,Object> result = new HashMap<String,Object>();
 		Location location = new Location(name, city, state, country, latitude, longitude);
 		//get user info
 		FacebookExec fbExecutioner = new FacebookExec(accessToken);
 		User facebookUser = fbExecutioner.getFacebookUserInfo();
 		FacadeUser facadeUser = new FacadeUserImpl();
 		model.User user = facadeUser.getUser(facebookUser);
-		//generate list of candidates from LOD
-		GenerationExec genExecutioner = new GenerationExec();
-		List<Film> filmList = genExecutioner.getRelatedFilms(location);
-		//get user likes
-		List<FacebookPage> facebookPageList = genExecutioner.getUserFacebookLikes(user.getFacebookID());
-		//rank film by word2vect + fbLikes
-		RankingExec rankExecutioner = new RankingExec();
-		List<Film> filmListVect = rankExecutioner.rankFilmsByVect(filmList, facebookPageList);
-		//rank film by lenskit
-		List<String> filmListLensKit = rankExecutioner.rankFilmByLenskit(filmList, user, 5);
-		Map<String,Object> result = new HashMap<String,Object>();
-		result.put("lk", filmListLensKit);
-		result.put("w2v", filmListVect);
+		if(user != null) {
+			//generate list of candidates from LOD
+			GenerationExec genExecutioner = new GenerationExec();
+			List<Film> filmList = genExecutioner.getRelatedFilms(location);
+			//get user likes
+			List<FacebookPage> facebookPageList = genExecutioner.getUserFacebookLikes(user);
+			//rank film by word2vect + fbLikes
+			RankingExec rankExecutioner = new RankingExec();
+			List<Film> filmListVect = rankExecutioner.rankFilmsByVect(filmList, facebookPageList);
+			//rank film by lenskit
+			List<String> filmListLensKit = rankExecutioner.rankFilmByLenskit(filmList, user, 5);
+			result.put("lk", filmListLensKit);
+			result.put("w2v", filmListVect);
+		}
 		return result;
 	}
 	
@@ -111,9 +114,12 @@ public class Controller {
 		User facebookUser = fbExecutioner.getFacebookUserInfo();
 		FacadeUser facadeUser = new FacadeUserImpl();
 		model.User user = facadeUser.getUser(facebookUser);
-		FacadeLensKit facadeLensKit = new FacadeLensKitImpl();
-		facadeLensKit.saveRatings(Long.parseLong(user.getId()), ratings);
-		return Response.status(200).build();
+		if(user != null) {
+			FacadeLensKit facadeLensKit = new FacadeLensKitImpl();
+			facadeLensKit.saveRatings(Long.parseLong(user.getId()), ratings);
+			return Response.status(200).build();
+		}
+		return Response.status(500).build();
 	}
 	
 	@POST
@@ -136,8 +142,11 @@ public class Controller {
 		User facebookUser = fbExecutioner.getFacebookUserInfo();
 		FacadeUser facadeUser = new FacadeUserImpl();
 		model.User user = facadeUser.getUser(facebookUser);
-		InterviewFileWriter.write(user, w2v, lk);
-		return Response.status(200).build();
+		if(user != null) {
+				InterviewFileWriter.write(user, w2v, lk);
+				return Response.status(200).build();
+		}
+		return Response.status(500).build();
 	}
 	
 	/*@GET

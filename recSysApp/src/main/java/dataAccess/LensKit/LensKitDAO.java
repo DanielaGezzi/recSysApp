@@ -48,18 +48,33 @@ public class LensKitDAO implements LensKitRepository {
 	@SuppressWarnings("deprecation")
 	public void loadData() {
 			
-			File file = new File(getClass().getClassLoader().getResource("movielens.yml").getFile());
-			Path dataFile = Paths.get(file.getPath());
-	        try {
-	            StaticDataSource data = StaticDataSource.load(dataFile);
-	            // get the data from the DAO
-	            this.dao = data.get();
-	        } catch (IOException e) {
-	            System.out.println("cannot load data" + e);
-	            throw Throwables.propagate(e);
-	        }
-			
-		}
+		File file = new File(getClass().getClassLoader().getResource("movielens.yml").getFile());
+		Path dataFile = Paths.get(file.getPath());
+        try {
+            StaticDataSource data = StaticDataSource.load(dataFile);
+            // get the data from the DAO
+            this.dao = data.get();
+        } catch (IOException e) {
+            System.out.println("cannot load data" + e);
+            throw Throwables.propagate(e);
+        }
+	}
+	
+	@SuppressWarnings("deprecation")
+	public DataAccessObject loadRemoteData() {
+		
+        File file = new File("movielens/movielens.yml");
+		Path dataFile = Paths.get(file.getPath());
+        try {
+            StaticDataSource data = StaticDataSource.load(dataFile);
+            // get the data from the DAO
+            this.dao = data.get();
+        } catch (IOException e) {
+            System.out.println("cannot load data" + e);
+            throw Throwables.propagate(e);
+        }
+        return this.dao;	
+	}
 	
 	public void saveRating(Long userId, String imdbId, double rating, Long timestamp){
 	    
@@ -69,9 +84,10 @@ public class LensKitDAO implements LensKitRepository {
         	movieId = (long) movieData.get(0).maybeGet("id");
         }
 		
-		File csvFile = new File(getClass().getClassLoader().getResource("ratings.csv").getFile());
+		File csvFile = new File("movielens/ratings.csv");
 		Path csvDataFile = Paths.get(csvFile.getPath());
 		CsvFileWriter.writeCsvFile(csvDataFile.toString(), userId + "," + movieId + "," + rating + "," + timestamp);
+
 	}
 	
 	public List<String> getRecommendations(long userId, int n, List<String> imdbIdList) {
@@ -200,12 +216,27 @@ public class LensKitDAO implements LensKitRepository {
 		return this.dao.query(Rating.class).withAttribute(CommonAttributes.ITEM_ID, movieId).count();
 	}
 
+	@SuppressWarnings("deprecation")
 	public List<String> getRecommendationsTest(long userId, int n, List<String> imdbIdList) {
 		List<String> recommendationList = new ArrayList<String>();
         Map<String, Double> mapFilmScore = new LinkedHashMap<String, Double>(); 
         
+        File file = new File("movielens/movielens.yml");
+		Path dataFile = Paths.get(file.getPath());
+        try {
+            StaticDataSource data = StaticDataSource.load(dataFile);
+            // get the data from the DAO
+            this.dao = data.get();
+        } catch (IOException e) {
+            System.out.println("cannot load data" + e);
+            throw Throwables.propagate(e);
+        }
+        
 		LensKitRecommender lkr = LensKitRecommender.getLensKitRecommender();
+		//lkr.setLkr(dao);
         try (LenskitRecommender rec = lkr.getLkr()) {
+        	
+        	
         	
     		Map<Long, String> temp = new HashMap<Long, String>();
         	for(String imdbid : imdbIdList) {

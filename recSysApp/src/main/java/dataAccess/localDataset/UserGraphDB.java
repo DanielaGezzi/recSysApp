@@ -49,8 +49,7 @@ public class UserGraphDB implements UserRepository {
 	}
 	
 	public User getUser(String userFbId) {
-		User user = new User();
-		user.setFacebookID(userFbId);
+		User user = null;
 		String query = "PREFIX db: <http://recsysapp/resource/>" + 
 					   "PREFIX user: <http://recsysapp/resource/user/>" + 
 					   "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>" + 
@@ -61,18 +60,18 @@ public class UserGraphDB implements UserRepository {
 							"    ?user user:userFbId \"" + userFbId +"\"." + 
 							"    ?user user:userId ?user_id." + 
 							"    ?user rdfs:label ?label." + 
-
 					   "}";
 		
 		try {	
 		    RepositoryConnection connection = repository.getConnection();
 		    try{
 		    	TupleQueryResult resultSet = connection.prepareTupleQuery(QueryLanguage.SPARQL,query).evaluate();
-		    
-				
+		    		
 				for (;resultSet.hasNext();) {
 				      BindingSet soln = resultSet.next();
 				      String id = soln.getValue("user_id").stringValue();
+				      user = new User();
+				      user.setFacebookID(userFbId);
 				      user.setId(id);
 			    }
 		    }
@@ -83,6 +82,33 @@ public class UserGraphDB implements UserRepository {
 			e.printStackTrace();
 		}
 		return user;
+	}
+	
+	public List<String> getUsersIds(){
+		List<String> idsList = new ArrayList<String>();
+		String query = "PREFIX user: <http://recsysapp/resource/user/>" +  
+					   "SELECT DISTINCT ?user ?user_id" +
+						"	WHERE {" + 
+						"    ?user user:userId ?user_id." + 
+						"} ORDER BY ?user_id";
+		
+		try {	
+		    RepositoryConnection connection = repository.getConnection();
+		    try{
+		    	TupleQueryResult resultSet = connection.prepareTupleQuery(QueryLanguage.SPARQL,query).evaluate();
+				for (;resultSet.hasNext();) {
+				      BindingSet soln = resultSet.next();
+				      String id = soln.getValue("user_id").stringValue();
+				      idsList.add(id);
+			    }
+		    }
+			finally{
+				connection.close();
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		return idsList;
 	}
 
 	public void saveUserLike(String userFbID, String facebookPageID) {

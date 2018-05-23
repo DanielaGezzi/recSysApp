@@ -464,6 +464,8 @@ $(document).ready(function(){
 				data: JSON.stringify(json),
 				success: function(response){
 					alert('Ratings saved! Select a new POI on the map to continue.')
+					lk_map = new Object();
+					w2v_map = new Object();
 				},
 				error: function(result, status, error){
 					alert("Sorry, an error occurred. Please try again later");

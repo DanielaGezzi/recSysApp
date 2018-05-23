@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import javax.inject.Singleton;
+
 import org.lenskit.LenskitConfiguration;
 import org.lenskit.LenskitRecommender;
 import org.lenskit.LenskitRecommenderEngine;
@@ -21,17 +23,19 @@ import org.lenskit.transform.normalize.UserVectorNormalizer;
 
 import com.google.common.base.Throwables;
 
+@Singleton
 public class LensKitRecommender {
 	
 	private static LensKitRecommender instance = null;
+	private LenskitRecommenderEngine engine = null;
 	LenskitRecommender lkr;
 			
-	public LenskitRecommender getLkr() {
-		return lkr;
+	private LensKitRecommender() {	
+		load();    
 	}
-
+	
 	@SuppressWarnings("deprecation")
-	private LensKitRecommender() {
+	public void load() {
 		
 		LenskitConfiguration config = new LenskitConfiguration();
 		// Use item-item CF to score items
@@ -60,16 +64,32 @@ public class LensKitRecommender {
             throw Throwables.propagate(e);
         }
         
-        LenskitRecommenderEngine engine = LenskitRecommenderEngine.build(config,dao);
-        this.lkr = engine.createRecommender(dao);
+        //System.out.println("BUILT INITIALIZE --------------------------------------------------------");
+        this.engine = LenskitRecommenderEngine.build(config,dao);
+        //System.out.println("BUILT END ---------------------------------------------------------------");
+
         
 	}
 	
 	public static synchronized LensKitRecommender getLensKitRecommender() {
 		if (instance == null) {
+			//System.out.println("instance è NULL quindi instanzio!  ----------------------------------");
 			instance = new LensKitRecommender();
+		}else {
+			//System.out.println("NON è NULL  ---------------------------------------------------------");
 		}
 		return instance;
+	}
+	
+	public LenskitRecommender getLkr() {
+		return lkr;
+	}
+	
+	public void setLkr(DataAccessObject dao) {
+        //System.out.println("CREO IL RECOMMENDER CON IL DAO ------------------------------------------");
+		this.lkr = engine.createRecommender(dao);
+        //System.out.println("FINE DI CREO IL RECOMMENDER CON IL DAO ----------------------------------");
+
 	}
 	
 	

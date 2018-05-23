@@ -10,6 +10,8 @@ public interface UserRepository {
 	void saveUser(User user);
 	
 	User getUser(String userFbId);
+	
+	List<String> getUsersIds();
 
 	void saveUserLike(String userID, String facebookID);
 	

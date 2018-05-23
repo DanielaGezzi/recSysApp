@@ -21,28 +21,41 @@
 </head>
 <body>
 <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-      <a class="navbar-brand" href="#">RecSysApp</a>
+      <a class="navbar-brand" href="/recSysApp/asktorate.html">RecSysApp</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
 
       <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item active">
-            <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+      	<ul class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/recSysApp/">Home <span class="sr-only"></span></a>
           </li>
-        </ul>
+          <li class="nav-item">
+            <a class="nav-link" href="/recSysApp/map.html">Map <span class="sr-only"></span></a>
+          </li>           
+        </ul>  
          <button id="btn-continue" class="btn btn-outline-success my-2 my-sm-0" type="submit">Continue!</button>    
          <button id="btn-fb-logout" class="btn btn-outline-success my-2 my-sm-0" type="submit">Logout</button>
       </div>
     </nav>
     <div id="container" class="container">
-   	 <div id="film-panel" class="film-panel">
-   	 <div id="loading-panel" class="loading-panel">
-   	 <p id="loading-film-text">Please wait... Loading movies...</p>
-   	 <img id="loading-img" src="./img/loading.gif"/>
-   	 </div>
-	</div>
+	   	 <div id="film-panel" class="film-panel">
+		   	 <div id="loading-panel" class="loading-panel">
+		   	 <p id="loading-film-text">Please wait... Loading movies...</p>
+		   	 <img id="loading-img" src="./img/loading.gif"/>
+		   	 </div>
+		   	 <div id="films1" class="films-list films-active"></div>
+		   	 <div id="films2" class="films-list"></div>
+		   	 <div id="films3" class="films-list"></div>
+		</div>
+			<div id="pagination-container" >
+			   	 <ul id ="pagination" class="pagination">
+	  				<li id="1" class="page-item active"><a class="page-link" href="#">1</a></li>
+	  				<li id="2" class="page-item"><a class="page-link" href="#">2</a></li>
+	 				<li id="3" class="page-item"><a class="page-link" href="#">3</a></li>
+				</ul>
+		   	 </div>
     </div>
 
 </body>

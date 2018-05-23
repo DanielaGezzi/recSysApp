@@ -8,6 +8,7 @@ import facade.FacadeUserImpl;
 import model.FacebookPage;
 import model.Film;
 import model.Location;
+import model.User;
 
 public class GenerationExec {
 	
@@ -28,10 +29,10 @@ public class GenerationExec {
 		return testList;
 	}
 	
-	public List<FacebookPage> getUserFacebookLikes(String facebookUserId){
+	public List<FacebookPage> getUserFacebookLikes(User user){
 		
 		FacadeUser facadeUser = new FacadeUserImpl();
-		return facadeUser.getUserLikes(facebookUserId);
+		return facadeUser.getUserLikes(user.getFacebookID());
 		
 	}
 	
