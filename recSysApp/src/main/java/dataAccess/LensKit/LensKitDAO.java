@@ -12,18 +12,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import org.lenskit.LenskitConfiguration;
 import org.lenskit.LenskitRecommender;
-import org.lenskit.LenskitRecommenderEngine;
 import org.lenskit.api.ItemRecommender;
-import org.lenskit.api.ItemScorer;
 import org.lenskit.api.RecommenderBuildException;
 import org.lenskit.api.Result;
 import org.lenskit.api.ResultList;
-import org.lenskit.baseline.BaselineScorer;
-import org.lenskit.baseline.ItemMeanRatingItemScorer;
-import org.lenskit.baseline.UserMeanBaseline;
-import org.lenskit.baseline.UserMeanItemScorer;
 import org.lenskit.data.dao.DataAccessObject;
 import org.lenskit.data.dao.file.StaticDataSource;
 import org.lenskit.data.entities.CommonAttributes;
@@ -31,9 +24,6 @@ import org.lenskit.data.entities.Entity;
 import org.lenskit.data.entities.EntityType;
 import org.lenskit.data.entities.TypedName;
 import org.lenskit.data.ratings.Rating;
-import org.lenskit.knn.item.ItemItemScorer;
-import org.lenskit.transform.normalize.BaselineSubtractingUserVectorNormalizer;
-import org.lenskit.transform.normalize.UserVectorNormalizer;
 import org.lenskit.util.io.ObjectStream;
 
 import com.google.common.base.Throwables;
@@ -89,55 +79,7 @@ public class LensKitDAO implements LensKitRepository {
 		CsvFileWriter.writeCsvFile(csvDataFile.toString(), userId + "," + movieId + "," + rating + "," + timestamp);
 
 	}
-	
-	public List<String> getRecommendations(long userId, int n, List<String> imdbIdList) {
-		List<String> recommendationList = new ArrayList<String>();
-        Map<String, Double> mapFilmScore = new LinkedHashMap<String, Double>(); 
 		
-		LenskitConfiguration config = new LenskitConfiguration();
-		// Use item-item CF to score items
-		config.bind(ItemScorer.class).to(ItemItemScorer.class);
-		// let's use personalized mean rating as the baseline/fallback predictor.
-		// 2-step process:
-		// First, use the user mean rating as the baseline scorer
-		config.bind(BaselineScorer.class, ItemScorer.class)
-		      .to(UserMeanItemScorer.class);
-		// Second, use the item mean rating as the base for user means
-		config.bind(UserMeanBaseline.class, ItemScorer.class)
-		      .to(ItemMeanRatingItemScorer.class);
-		// and normalize ratings by baseline prior to computing similarities
-		config.bind(UserVectorNormalizer.class)
-		      .to(BaselineSubtractingUserVectorNormalizer.class);
-		
-		LenskitRecommenderEngine engine = LenskitRecommenderEngine.build(config, this.dao);
-        try (LenskitRecommender rec = engine.createRecommender(this.dao)) {
-        	
-    		Map<Long, String> temp = new HashMap<Long, String>();
-        	for(String imdbid : imdbIdList) {
-    	        List<Entity> movieData = this.dao.query(EntityType.forName("item-ids")).withAttribute(TypedName.create("imdbid", String.class), imdbid).get();
-    	        if(!movieData.isEmpty()) {
-    	        	long id = (long) movieData.get(0).maybeGet("id");
-    	        	temp.put(id, imdbid);
-    	        }
-    		}	
-        	
-        	ItemRecommender irec = rec.getItemRecommender();
-        	assert irec != null; // not null because we configured one
-        	ResultList recs = irec.recommendWithDetails(userId, n, temp.keySet(), null);
-        	//System.out.format("Recommendations for %d:\n", userId);
-            for (Result item : recs) {   
-                mapFilmScore.put(temp.get(item.getId()), item.getScore());
-                //System.out.format("\t%s -----> %.2f\n", temp.get(item.getId()), item.getScore());
-            }
-		} catch (RecommenderBuildException e) {
-			e.printStackTrace();
-		}
-        
-		recommendationList.addAll(mapFilmScore.keySet());
-		return recommendationList;
-        
-	}
-	
 	public List<String> getLogPopularityEntropyFilms() {
 		List<String> orderedFilmList = new ArrayList<String>();        
         Map<String, Double> filmLogPopEntr = new LinkedHashMap<String, Double>(); 
@@ -217,7 +159,7 @@ public class LensKitDAO implements LensKitRepository {
 	}
 
 	@SuppressWarnings("deprecation")
-	public List<String> getRecommendationsTest(long userId, int n, List<String> imdbIdList) {
+	public List<String> getRecommendations(long userId, int n, List<String> imdbIdList) {
 		List<String> recommendationList = new ArrayList<String>();
         Map<String, Double> mapFilmScore = new LinkedHashMap<String, Double>(); 
         
@@ -330,6 +272,55 @@ public class LensKitDAO implements LensKitRepository {
 				System.out.println(r.getItemId() + " --- " + r.getValue());
 			}
 		}
+	}
+	
+	
+		public List<String> getRecommendationsOLD(long userId, int n, List<String> imdbIdList) {
+		List<String> recommendationList = new ArrayList<String>();
+        Map<String, Double> mapFilmScore = new LinkedHashMap<String, Double>(); 
+		
+		LenskitConfiguration config = new LenskitConfiguration();
+		// Use item-item CF to score items
+		config.bind(ItemScorer.class).to(ItemItemScorer.class);
+		// let's use personalized mean rating as the baseline/fallback predictor.
+		// 2-step process:
+		// First, use the user mean rating as the baseline scorer
+		config.bind(BaselineScorer.class, ItemScorer.class)
+		      .to(UserMeanItemScorer.class);
+		// Second, use the item mean rating as the base for user means
+		config.bind(UserMeanBaseline.class, ItemScorer.class)
+		      .to(ItemMeanRatingItemScorer.class);
+		// and normalize ratings by baseline prior to computing similarities
+		config.bind(UserVectorNormalizer.class)
+		      .to(BaselineSubtractingUserVectorNormalizer.class);
+		
+		LenskitRecommenderEngine engine = LenskitRecommenderEngine.build(config, this.dao);
+        try (LenskitRecommender rec = engine.createRecommender(this.dao)) {
+        	
+    		Map<Long, String> temp = new HashMap<Long, String>();
+        	for(String imdbid : imdbIdList) {
+    	        List<Entity> movieData = this.dao.query(EntityType.forName("item-ids")).withAttribute(TypedName.create("imdbid", String.class), imdbid).get();
+    	        if(!movieData.isEmpty()) {
+    	        	long id = (long) movieData.get(0).maybeGet("id");
+    	        	temp.put(id, imdbid);
+    	        }
+    		}	
+        	
+        	ItemRecommender irec = rec.getItemRecommender();
+        	assert irec != null; // not null because we configured one
+        	ResultList recs = irec.recommendWithDetails(userId, n, temp.keySet(), null);
+        	//System.out.format("Recommendations for %d:\n", userId);
+            for (Result item : recs) {   
+                mapFilmScore.put(temp.get(item.getId()), item.getScore());
+                //System.out.format("\t%s -----> %.2f\n", temp.get(item.getId()), item.getScore());
+            }
+		} catch (RecommenderBuildException e) {
+			e.printStackTrace();
+		}
+        
+		recommendationList.addAll(mapFilmScore.keySet());
+		return recommendationList;
+        
 	}
 	*/
 	

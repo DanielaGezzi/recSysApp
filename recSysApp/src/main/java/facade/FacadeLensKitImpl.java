@@ -37,7 +37,7 @@ public class FacadeLensKitImpl implements FacadeLensKit {
 		for(Film f : filmList){
 			imdbIdList.add(f.getImdbId().substring(2));
 		}
-		return lkRepo.getRecommendationsTest(userId, n, imdbIdList);
+		return lkRepo.getRecommendations(userId, n, imdbIdList);
 	}
 
 }

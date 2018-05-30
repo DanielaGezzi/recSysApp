@@ -10,16 +10,9 @@ import javax.inject.Singleton;
 import org.lenskit.LenskitConfiguration;
 import org.lenskit.LenskitRecommender;
 import org.lenskit.LenskitRecommenderEngine;
-import org.lenskit.api.ItemScorer;
-import org.lenskit.baseline.BaselineScorer;
-import org.lenskit.baseline.ItemMeanRatingItemScorer;
-import org.lenskit.baseline.UserMeanBaseline;
-import org.lenskit.baseline.UserMeanItemScorer;
+import org.lenskit.RecommenderConfigurationException;
 import org.lenskit.data.dao.DataAccessObject;
 import org.lenskit.data.dao.file.StaticDataSource;
-import org.lenskit.knn.item.ItemItemScorer;
-import org.lenskit.transform.normalize.BaselineSubtractingUserVectorNormalizer;
-import org.lenskit.transform.normalize.UserVectorNormalizer;
 
 import com.google.common.base.Throwables;
 
@@ -37,7 +30,7 @@ public class LensKitRecommender {
 	@SuppressWarnings("deprecation")
 	public void load() {
 		
-		LenskitConfiguration config = new LenskitConfiguration();
+		/*LenskitConfiguration config = new LenskitConfiguration();
 		// Use item-item CF to score items
 		config.bind(ItemScorer.class).to(ItemItemScorer.class);
 		// let's use personalized mean rating as the baseline/fallback predictor.
@@ -50,7 +43,7 @@ public class LensKitRecommender {
 		      .to(ItemMeanRatingItemScorer.class);
 		// and normalize ratings by baseline prior to computing similarities
 		config.bind(UserVectorNormalizer.class)
-		      .to(BaselineSubtractingUserVectorNormalizer.class);
+		      .to(BaselineSubtractingUserVectorNormalizer.class);*/
 		
 		DataAccessObject dao;
 		File file = new File(getClass().getClassLoader().getResource("movielens.yml").getFile());
@@ -64,19 +57,36 @@ public class LensKitRecommender {
             throw Throwables.propagate(e);
         }
         
-        //System.out.println("BUILT INITIALIZE --------------------------------------------------------");
-        this.engine = LenskitRecommenderEngine.build(config,dao);
-        //System.out.println("BUILT END ---------------------------------------------------------------");
-
+        LenskitConfiguration dataConfig = new LenskitConfiguration();
+        dataConfig.addComponent(dao);
         
+        try {
+        	
+			this.engine = LenskitRecommenderEngine.newLoader()
+			        			.addConfiguration(dataConfig)
+			        			.load(new File("LKmodels/model20M.bin"));
+			
+		} catch (RecommenderConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+        /*LenskitRecommenderEngine.newBuilder()
+                							.addConfiguration(config)
+                							.addConfiguration(dataConfig,
+                											ModelDisposition.EXCLUDED)
+                							.build();*/
+
+        this.lkr = engine.createRecommender(dao);
 	}
 	
 	public static synchronized LensKitRecommender getLensKitRecommender() {
 		if (instance == null) {
-			//System.out.println("instance è NULL quindi instanzio!  ----------------------------------");
 			instance = new LensKitRecommender();
 		}else {
-			//System.out.println("NON è NULL  ---------------------------------------------------------");
 		}
 		return instance;
 	}
@@ -86,9 +96,7 @@ public class LensKitRecommender {
 	}
 	
 	public void setLkr(DataAccessObject dao) {
-        //System.out.println("CREO IL RECOMMENDER CON IL DAO ------------------------------------------");
 		this.lkr = engine.createRecommender(dao);
-        //System.out.println("FINE DI CREO IL RECOMMENDER CON IL DAO ----------------------------------");
 
 	}
 	

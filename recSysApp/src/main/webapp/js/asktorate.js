@@ -2,12 +2,15 @@ $(document).ready(function(){
 	document.getElementById('loading-img').style.display = "block";
 	$.ajax({
 		type: "GET",
-		url: "/recSysApp/rest/services/film/askToRate/54",
+		url: "/recSysApp/rest/services/film/askToRate/90",
 		success: function(response){
 			document.getElementById('loading-panel').style.display = "none";
 			getFilmFromOmdb(response.slice(0,17), 1);
 			getFilmFromOmdb(response.slice(18,35), 2);
 			getFilmFromOmdb(response.slice(36,53), 3);
+			getFilmFromOmdb(response.slice(54,71), 4);
+			getFilmFromOmdb(response.slice(72,89), 5);
+
 			document.getElementById('pagination-container').style.display = "block";
 
 		},
@@ -157,10 +160,11 @@ function getFilmFromOmdb(filmList, page){
 			url: "http://www.omdbapi.com/?i=tt"+ filmList[count] +"&apikey="+config.OMDB_API_KEY,
 			success: function(response){
 				if(response.Response == 'True'){
+					console.log("true" + count);
 					$('#films'+page).append('<div id="film" class="film" data-tooltip=#'+ response.imdbID +'>' +
 												'<div class="poster" data-tooltip=#'+ response.imdbID +'>' +
 												'<a href="https:\/\/www.imdb.com\/title\/'+ response.imdbID +'" target="_blank">'+
-												'<img src='+ response.Poster +' style="width:150px; height:auto"></a>' +
+												'<img class="poster" src='+ response.Poster +'></a>' +
 												'</div>' +
 												'<p>'+ response.Title +'</p>' +
 											   	'<select id="score" data-tooltip=#'+ response.imdbID +'>' +

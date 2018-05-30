@@ -133,7 +133,9 @@ $(document).ready(function(){
 	    flyTo(coordinate, function(){});
 	    window.setTimeout(function () {
 	    content.innerHTML = '<p>You are here:</p><code>' +
-	    					coordinate + '<br>' +
+							'Coordinates: [' +
+							Number(coordinate[0]).toFixed(3) + ' - ' + 
+							Number(coordinate[1]).toFixed(3) +']<br>' +							
 	    					evt.address.formatted +
 	    					'</code>';
 	    popup.setPosition(coordinate);
