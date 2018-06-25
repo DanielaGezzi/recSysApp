@@ -132,18 +132,20 @@ public class Controller{
 		Map<String, Object> map = gson.fromJson(requestPayload, Map.class);
 		System.out.println(map);
 		@SuppressWarnings("unchecked")
-		Map<String, Double> w2v = (Map<String,Double>) map.get("w2v");
+		Map<String, Double> w2vNov = (Map<String,Double>) map.get("w2vnov");
 		@SuppressWarnings("unchecked")
-		Map<String,Double> lk = (Map<String,Double>) map.get("lk");
-		System.out.println(w2v);
-		System.out.println(lk);
+		Map<String, Double> w2vDCG = (Map<String,Double>) map.get("w2vdcg");
+		@SuppressWarnings("unchecked")
+		Map<String,Double> lkNov = (Map<String,Double>) map.get("lknov");
+		@SuppressWarnings("unchecked")
+		Map<String,Double> lkDCG = (Map<String,Double>) map.get("lkdcg");
     	String accessToken = (String) map.get("accessToken");
 		FacebookExec fbExecutioner = new FacebookExec(accessToken);
 		User facebookUser = fbExecutioner.getFacebookUserInfo();
 		FacadeUser facadeUser = new FacadeUserImpl();
 		model.User user = facadeUser.getUser(facebookUser);
 		if(user != null) {
-				InterviewFileWriter.write(user, w2v, lk);
+				InterviewFileWriter.write(user, w2vNov, w2vDCG, lkNov, lkDCG);
 				return Response.status(200).build();
 		}
 		return Response.status(500).build();

@@ -186,7 +186,7 @@ function getFilmFromOmdb(filmList, page){
 				}
 			},
 			error: function(result, status, error){
-				alert("Sorry, an error occurred retrieving film information. Please try again later");
+				alert("Sorry, an error occurred retrieving film information from Imdb. Please try again later");
 			}
 		})
 		count++;

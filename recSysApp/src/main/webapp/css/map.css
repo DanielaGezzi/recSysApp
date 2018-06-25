@@ -32,8 +32,8 @@
     padding: 20px 15px 20px 15px;
     text-align: center;
     display: none;
-    align-items:flex-start;
-	
+	flex-wrap: wrap;
+	justify-content : center;
 }
 
 .film-panel-w2v, .film-panel-lk {
@@ -65,6 +65,8 @@
 	display: block;
 	max-width: 300px;
 	vertical-align: top;
+	text-align: center;
+	
 }
 
 .poster {
@@ -147,5 +149,13 @@ img.poster {
 	  
 #btn-save {
 	display: none;
+}
+
+p.title {
+	font-weight: bold;
+}
+
+p.interview {
+	font-style: oblique;
 }
 	  

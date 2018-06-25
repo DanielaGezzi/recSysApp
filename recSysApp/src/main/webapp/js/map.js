@@ -276,8 +276,10 @@ $(document).ready(function(){
 					dataType: "json",
 					success: function(response){
 						//console.log(response);
-						lk_map = new Object();
-						w2v_map = new Object();
+						lk_map_nov = new Object();
+						lk_map_dcg = new Object();
+						w2v_map_nov = new Object();
+						w2v_map_dcg = new Object();
 						document.getElementById('film-panel').style.display = "flex";
 						getFilmsInfoW2V(response.w2v, function(){});
 						getFilmsInfoLK(response.lk, function(){});
@@ -307,13 +309,15 @@ $(document).ready(function(){
 	};
 	
 
-	var w2v_map;
+	var w2v_map_nov;
+	var w2v_map_dcg;
 	function getFilmsInfoW2V(films, done){
-		$('#film-panel-w2v').empty();
+		$('#film-panel').empty();
 		var count = 0;
 		var max = 5;
 		while(count<max){
-			w2v_map[films[count].imdbId.substring(2)] = 0;
+			w2v_map_nov[films[count].imdbId.substring(2)] = -1;
+			w2v_map_dcg[films[count].imdbId.substring(2)] = -1;
 			$.ajax({
 				type: "GET",
 				url: "http://www.omdbapi.com/?i="+ films[count].imdbId +"&apikey="+config.OMDB_API_KEY,
@@ -324,14 +328,20 @@ $(document).ready(function(){
 														'<a href="https:\/\/www.imdb.com\/title\/'+ response.imdbID +'" target="_blank">'+
 														'<img class="poster" src='+ response.Poster +'></a>' +
 														'</div>' +
-														'<p>'+ response.Title +'</p>' +	
-													   	'<select id="w2v-score" data-tooltip=#'+ response.imdbID +'>' +
+														'<p class="title">'+ response.Title +'</p>' +	
+														'<p class="interview">Do you know the film?</p>' +	
+													   	'<select id="w2v-nov" data-tooltip=#'+ response.imdbID +'>' +
 													   	'<option value="" selected disabled hidden>*</option>' +
-													   	'<option value="1">1</option>' +
-													   	'<option value="2">2</option>' +
-													   	'<option value="3">3</option>' +
-													   	'<option value="4">4</option>' +
-													   	'<option value="5">5</option>' +
+													   	'<option value="0">I don\'t know it</option>' +
+													   	'<option value="1">I know it but I\'ve never seen it</option>' +
+													   	'<option value="2">I\'ve already seen it</option>' +
+													   	'</select>' +
+														'<p class="interview">How do you rate this recommendation?</p>' +	
+													   	'<select id="w2v-dcg" data-tooltip=#'+ response.imdbID +'>' +
+													   	'<option value="" selected disabled hidden>*</option>' +
+													   	'<option value="0">not interesting</option>' +
+													   	'<option value="1">interesting</option>' +
+													   	'<option value="2">very interesting</option>' +
 													   	'</select>' +														
 														'</div>');
 						$('#film-panel').append('<div class="over-popup" id='+ response.imdbID +'>'+
@@ -353,13 +363,14 @@ $(document).ready(function(){
 		}	 
 		
 	}
-	var lk_map;
+	var lk_map_nov;
+	var lk_map_dcg;
 	function getFilmsInfoLK(list, done){
-		$('#film-panel-lk').empty();		
 		var count = 0;
 		var max = 5;
 		while(count<max){
-			lk_map[list[count]] =  0;
+			lk_map_nov[list[count]] =  -1;
+			lk_map_dcg[list[count]] =  -1;
 			$.ajax({
 				type: "GET",
 				url: "http://www.omdbapi.com/?i=tt"+ list[count] +"&apikey="+config.OMDB_API_KEY,
@@ -370,15 +381,21 @@ $(document).ready(function(){
 														'<a href="https:\/\/www.imdb.com\/title\/'+ response.imdbID +'" target="_blank">'+
 														'<img class="poster" src='+ response.Poster +' ></a>' +
 														'</div>' +
-														'<p>'+ response.Title +'</p>' +
-													   	'<select id="lk-score" data-tooltip=#'+ response.imdbID +'>' +
+														'<p class="title">'+ response.Title +'</p>' +
+														'<p class="interview">Do you know the film?</p>' +	
+													   	'<select id="lk-nov" data-tooltip=#'+ response.imdbID +'>' +
 													   	'<option value="" selected disabled hidden>*</option>' +
-													   	'<option value="1">1</option>' +
-													   	'<option value="2">2</option>' +
-													   	'<option value="3">3</option>' +
-													   	'<option value="4">4</option>' +
-													   	'<option value="5">5</option>' +
-													   	'</select>' +														
+													   	'<option value="0">I don\'t know it</option>' +
+													   	'<option value="1">I know it but I\'ve never seen it</option>' +
+													   	'<option value="2">I\'ve already seen it</option>' +
+													   	'</select><br>' +
+														'<p class="interview">How do you rate this recommendation?</p>' +	
+													   	'<select id="lk-dcg" data-tooltip=#'+ response.imdbID +'>' +
+													   	'<option value="" selected disabled hidden>*</option>' +
+													   	'<option value="0">not interesting</option>' +
+													   	'<option value="1">interesting</option>' +
+													   	'<option value="2">very interesting</option>' +
+													   	'</select>' +													
 														'</div>');
 						$('#film-panel').append('<div class="over-popup" id='+ response.imdbID +'>'+
 													'<p><b>Title</b>: '+ response.Title +'</p>'+
@@ -440,29 +457,43 @@ $(document).ready(function(){
 	    $($(this).data("tooltip")).hide();
 	        
 	})
-	.on('change','#w2v-score', function () {
+	.on('change','#w2v-nov', function () {
 	    var optionSelected = $("option:selected", this);
 	    var valueSelected = parseInt(optionSelected.val());
 	    var imdbid = $(this).data("tooltip").substring(3);
-	    w2v_map[imdbid] = valueSelected;
-	    console.log(w2v_map);
-
-
+	    w2v_map_nov[imdbid] = valueSelected;
+	    console.log(w2v_map_nov);
 	})
-	.on('change','#lk-score', function () {
+	.on('change','#w2v-dcg', function () {
 	    var optionSelected = $("option:selected", this);
 	    var valueSelected = parseInt(optionSelected.val());
 	    var imdbid = $(this).data("tooltip").substring(3);
-	    lk_map[imdbid] = valueSelected;
-	    console.log(lk_map);
+	    w2v_map_dcg[imdbid] = valueSelected;
+	    console.log(w2v_map_dcg);
+	})
+	.on('change','#lk-nov', function () {
+	    var optionSelected = $("option:selected", this);
+	    var valueSelected = parseInt(optionSelected.val());
+	    var imdbid = $(this).data("tooltip").substring(3);
+	    lk_map_nov[imdbid] = valueSelected;
+	    console.log(lk_map_nov);
+	})
+	.on('change','#lk-dcg', function () {
+	    var optionSelected = $("option:selected", this);
+	    var valueSelected = parseInt(optionSelected.val());
+	    var imdbid = $(this).data("tooltip").substring(3);
+	    lk_map_dcg[imdbid] = valueSelected;
+	    console.log(lk_map_dcg);
 	});
 	
 	$("#btn-save").on('click', function(){
 		FB.getLoginStatus(function(response) {       	
         	var json = {
 	        			accessToken : response.authResponse.accessToken,
-	        			w2v : w2v_map,
-	    				lk : lk_map
+	        			w2vnov : w2v_map_nov,
+	        			w2vdcg : w2v_map_dcg,
+	    				lknov : lk_map_nov,
+	    				lkdcg : lk_map_dcg
     					};
         	$.ajax({
 				type: "POST",
